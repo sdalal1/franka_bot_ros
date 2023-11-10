@@ -19,7 +19,7 @@ from moveit_msgs.action import MoveGroup, ExecuteTrajectory
 from moveit_msgs.msg import CollisionObject
 from geometry_msgs.msg import (Pose, Point)
 from sensor_msgs.msg import JointState
-from moveit_msgs.srv import GetPositionIK, GetPlanningScene, ApplyPlanningScene
+from moveit_msgs.srv import GetPositionIK, GetPlanningScene, ApplyPlanningScene, GetCartesianPath
 from shape_msgs.msg import SolidPrimitive
 from .populate_msg import PopulateMsgs
 from enum import Enum, auto
@@ -74,6 +74,8 @@ class Wrapper:
             self.node.get_logger().info(
                 'apply planning scence service not available, waiting again...'
                 )
+            
+        self.cartesian_srv_client = self.node.create_client(GetCartesianPath, "compute_cartesian_path")
 
         # Robot Type -- choice between franka and interbotix
         self.robot_type = robot_type
@@ -169,6 +171,23 @@ class Wrapper:
 
         future.add_done_callback(self.goal_path_cb)
 
+    def future_cartesian_cb(self, future):
+        # returns RobotState msg, RobotTrajectory msg, fraction (the fraction of that path computed), and error_code
+        robot_traj = future.result().solution
+        frac = future.result().fraction
+        print("fraction", frac)
+
+        traj_motion = ExecuteTrajectory().Goal
+        traj_motion.trajectory = robot_traj
+
+        self.node.get_logger().info("Executing Cartesian Trajectory ...")
+        if frac is not None or frac !=1.0:
+            print(f'Fraction: {frac}')
+        future = self.execute_action.send_goal_async(traj_motion)
+        future.add_done_callback(self.future_execute_callback)
+
+
+
     def goal_path_cb(self, future):
         """
         Call back function for the goal position path.
@@ -226,6 +245,32 @@ class Wrapper:
     def get_execute_result_cb(self, future):
         """Change the state to done."""
         self.state = FRANKA.DONE
+
+
+    # compute_cartesian_path(waypoints, eef_step = 0.01, jump_threshold = 0.0)
+    def plan_path_cartesian(self, waypoints, dT):
+        """
+        Cartesian path directly by specifying a list of waypoints for the end-effector to go through.
+        """
+        frame_id = 'panda_link0'
+        # link_name = 
+        # max_step =
+        # jump_theshold = '
+        # position = 
+        # jump_theshold =
+        # dT = self.node.get_clock().now().to_msg()
+        start_state =  [0.30714, 0.0, 0.5951]
+        # dT = [1.0, 2.0, 3.0]
+        cartesian_msgs_request = self.pop_msgs.set_GetCartesianPositionRqt(self.robot_type, frame_id,start_state, self.joint_names, waypoints)
+        print("cartesian msg", cartesian_msgs_request)
+        # THIS IS INCORRECT BECAUSE NEED TO PASS IN THE MESSAGES IN THE POP MES
+        self.cartesian_future = self.cartesian_srv_client.call_async(cartesian_msgs_request)
+
+        self.cartesian_future.add_done_callback(self.future_cartesian_cb)
+
+        # future_cart.add_done_callback(self.goal_path_cb)
+
+            
 
     def plan_path_to_position(self, positions):
         """
