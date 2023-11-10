@@ -8,7 +8,7 @@ It is used to populate the messages for the moveit_msgs.
 from rclpy.node import Node
 from geometry_msgs.msg import Pose, Point, Quaternion, PoseStamped, Vector3
 from sensor_msgs.msg import JointState, MultiDOFJointState
-from moveit_msgs.srv import GetPositionIK
+from moveit_msgs.srv import GetPositionIK, GetCartesianPath
 from builtin_interfaces.msg import Duration
 from moveit_msgs.action import MoveGroup
 from moveit_msgs.msg import (JointConstraint, TrajectoryConstraints,
@@ -16,7 +16,7 @@ from moveit_msgs.msg import (JointConstraint, TrajectoryConstraints,
                              PlanningOptions, RobotState,
                              AllowedCollisionMatrix, PlanningSceneWorld,
                              MotionPlanRequest, WorkspaceParameters,
-                             PositionIKRequest, RobotTrajectory)
+                             PositionIKRequest, RobotTrajectory, CartesianTrajectory, CartesianTrajectoryPoint, CartesianPoint)
 from octomap_msgs.msg import OctomapWithPose, Octomap
 from enum import Enum, auto
 from trajectory_msgs.msg import JointTrajectory
@@ -47,6 +47,82 @@ class PopulateMsgs():
         self.group_name = group_name
         self.state = State.NEUTRAL
         self.node = node
+
+
+    # def set_CartesianTrajectoryMsgs(self, waypoints, orientations, dT, frame_id):
+    #     ct_msg = CartesianTrajectory()
+    #     points = []
+    #     ct_msg.header.stamp = self.node.get_clock().now().to_msg()
+    #     ct_msg.header.frame = frame_id
+        
+    #     for p, o, dt in zip(waypoints, orientations, dT):
+    #         points.append(self.set_CartesianTrajectoryPoint(p,o, dt))
+
+    #     ct_msg.points = points
+    #     ct_msg.tracked_frame = frame_id
+    #     return ct_msg
+
+    # def set_CartesianTrajectoryPoint(self, position, orientation, dt):
+    #     ctp_msg = CartesianTrajectory()
+    #     ctp_msg.point = self.set_CartesianPoint(position, orientation)
+    #     dt = Duration()
+    #     ctp_msg.time_from_start = dt
+    #     return ctp_msg
+
+    # def set_CartesianPoint(self, position, orientation):
+    #     cp_msg = CartesianPoint()
+    #     cp_msg.pose = self.set_PoseMsgs(position, orientation)
+    #     return cp_msg
+    
+
+    def set_GetCartesianPositionRqt(self, group_name, frame_id, position, joint_names, waypoints):  # max_step, jump_threshold):
+        cart_pos_rqst = GetCartesianPath.Request()
+        cart_pos_rqst.header.stamp = self.node.get_clock().now().to_msg()
+        cart_pos_rqst.header.frame_id = frame_id
+        
+        cart_pos_rqst.start_state = self.set_RobotState(frame_id, joint_names, position)
+        cart_pos_rqst.group_name = group_name
+        # cart_pos_rqst.link_name = link_name
+        cart_pos_rqst.waypoints = waypoints #this must be a list of Pose() msgs
+        # cart_pos_rqst.max_step = max_step
+        # cart_pos_rqst.jump_threshold = jump_threshold 
+
+    
+    # def set_CartesianTrajectoryMsgs(self, waypoints, dT, frame_id):
+    #     ct_msg = CartesianTrajectory()
+    #     ct_msg.header.stamp = self.node.get_clock().now().to_msg()
+    #     wypts = []
+    #     # wypts.append(self.set_CartesianTrajectoryPoint(waypoints, dT))
+    #     for p, dt in zip(waypoints, dT):
+    #         wypts.append(self.set_CartesianTrajectoryPoint(p, dt))
+
+    #     ct_msg.points = wypts
+    #     ct_msg.tracked_frame = frame_id
+    #     return ct_msg
+
+    # def set_CartesianTrajectoryPoint(self, position, dt):
+    #     ctp_msg = CartesianTrajectoryPoint()
+    #     ctp_msg.point = self.set_CartesianPoint(position)
+    #     dt_msg = Duration()
+    #     dt_msg.sec = dt
+    #     ctp_msg.time_from_start = dt_msg
+    #     return ctp_msg
+
+    def set_CartesianPoint(self, position):
+        cp_msg = CartesianPoint()
+        cp_msg.pose = self.set_PoseMsgs_position(position)
+        return cp_msg
+    
+    def set_PoseMsgs_position(self, position):
+        pose_msgs = Pose()
+        pose_msgs.position = position
+        return pose_msgs
+
+    def set_PoseMsgs(self, position, orientation):
+        pose_msgs = Pose()
+        pose_msgs.position = position
+        pose_msgs.orientation = orientation
+        return pose_msgs
 
     def set_RobotTrajectoryMsgs(self, path):
         robot_traj = RobotTrajectory()
