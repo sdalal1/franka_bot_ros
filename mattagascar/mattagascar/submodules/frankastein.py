@@ -252,6 +252,24 @@ class Wrapper:
         """
         Cartesian path directly by specifying a list of waypoints for the end-effector to go through.
         """
+        # z = 0.21811
+
+        # for waypoint in waypoints: 
+        #     action_dot = []
+        #     standoff = Pose()
+        #     standoff.position.x = waypoint.position.x
+        #     standoff.position.y = waypoint.position.y
+        #     standoff.position.z = z
+
+        #     dot_pos = Pose()
+        #     dot_pos.position.x = waypoint.position.x
+        #     dot_pos.position.y = waypoint.position.y
+        #     dot_pos.position.z = 0.06
+
+        #     action_dot.append(standoff)
+        #     action_dot.append(dot_pos)
+        #     action_dot.append(standoff)
+
         frame_id = 'panda_link0'
         # link_name = 
         # max_step =
@@ -263,7 +281,7 @@ class Wrapper:
         start_state = [0.30724, 0.00054, 0.59104]
         # dT = [1.0, 2.0, 3.0]
         cartesian_msgs_request = self.pop_msgs.set_GetCartesianPositionRqt(self.robot_type, frame_id, start_state, self.ee_joint_names, waypoints)
-        print("cartesian msg", cartesian_msgs_request)
+        # print("cartesian msg", cartesian_msgs_request)
         # THIS IS INCORRECT BECAUSE NEED TO PASS IN THE MESSAGES IN THE POP MES
         self.cartesian_future = self.cartesian_srv_client.call_async(cartesian_msgs_request)
 

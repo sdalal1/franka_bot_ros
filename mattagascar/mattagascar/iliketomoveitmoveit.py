@@ -68,7 +68,7 @@ class ILikeToMoveItMoveIt(Node):
         self.z = 0.21811
 
         # self.waypoints = [wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8]
-
+        # action_dot = []
         for cooridainte in coordinate_list:
             waypoint = Pose()
             # from IPython import embed; embed()
@@ -76,7 +76,28 @@ class ILikeToMoveItMoveIt(Node):
             waypoint.position.y = cooridainte[1]
             waypoint.position.z = self.z
             waypoint.orientation = self.orientation
+
+            standoff = waypoint
+
+            dot_pos = Pose()
+            dot_pos.position.x = standoff.position.x
+            dot_pos.position.y = standoff.position.y
+            dot_pos.position.z = 0.07
+            dot_pos.orientation = self.orientation
+
             self.waypoints.append(waypoint)
+            self.waypoints.append(dot_pos)
+            self.waypoints.append(standoff)
+            
+        print("waypoints", self.waypoints)
+        # from IPython import embed; embed()
+        # oirginal waypoints = self.waypoints
+        # up motion
+        common_waypoint = Pose()
+        common_waypoint.position.x = 0.45354
+        common_waypoint.position.y = -0.19164
+        common_waypoint.position.z = self.z
+            
         # from IPython import embed; embed()
         # wp1.position.x = 0.40569
         # wp1.position.y = -0.01668
