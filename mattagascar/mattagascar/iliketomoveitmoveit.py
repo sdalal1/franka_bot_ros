@@ -77,7 +77,8 @@ class ILikeToMoveItMoveIt(Node):
         self.paint_location_dip = Pose()
         self.paint_location_dip.position.x = 0.40275
         self.paint_location_dip.position.y = 0.43162
-        self.paint_location_dip.position.z = self.z_dot-0.05
+        # NOTE: we were subtracting 0.05 from the z value and keeping max_step = 0.1 and it was working but once we just decreased max_step, it also worked??
+        self.paint_location_dip.position.z = self.z_dot
         self.paint_location_dip.orientation = self.orientation
 
 
