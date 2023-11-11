@@ -56,7 +56,8 @@ class ILikeToMoveItMoveIt(Node):
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
         # from IPython import embed; embed()
-        coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points.csv', unpack= True, delimiter=',')
+        # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_many.csv', unpack= True, delimiter=',')
+        coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         coordinate_list = []
 
         for x, y in zip(coordinate_x, coordinate_y):
@@ -65,38 +66,60 @@ class ILikeToMoveItMoveIt(Node):
 
         self.waypoints = []
 
-        self.z = 0.21811
+        self.z_standoff = 0.25
+        self.z_dot = 0.19
+        self.paint_location_standoff = Pose()
+        self.paint_location_standoff.position.x = 0.40275
+        self.paint_location_standoff.position.y = 0.43162
+        self.paint_location_standoff.position.z = self.z_standoff
+        self.paint_location_standoff.orientation = self.orientation
+        
+        self.paint_location_dip = Pose()
+        self.paint_location_dip.position.x = 0.40275
+        self.paint_location_dip.position.y = 0.43162
+        self.paint_location_dip.position.z = self.z_dot-0.05
+        self.paint_location_dip.orientation = self.orientation
 
-        # self.waypoints = [wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8]
-        # action_dot = []
-        for cooridainte in coordinate_list:
-            waypoint = Pose()
+
+        # simulating it to go refill on paint
+        # x = 0.40275
+        # y = 0.43162
+        # z = 0.21435
+
+        for i, cooridainte in enumerate(coordinate_list):
+
+            # if i%5 == 0:
+            standoff = Pose()
             # from IPython import embed; embed()
-            waypoint.position.x = cooridainte[0]
-            waypoint.position.y = cooridainte[1]
-            waypoint.position.z = self.z
-            waypoint.orientation = self.orientation
-
-            standoff = waypoint
+            standoff.position.x = cooridainte[0]
+            standoff.position.y = cooridainte[1]
+            standoff.position.z = self.z_standoff
+            standoff.orientation = self.orientation
 
             dot_pos = Pose()
             dot_pos.position.x = standoff.position.x
             dot_pos.position.y = standoff.position.y
-            dot_pos.position.z = 0.07
+            dot_pos.position.z = self.z_dot
             dot_pos.orientation = self.orientation
 
-            self.waypoints.append(waypoint)
+            self.waypoints.append(standoff)
             self.waypoints.append(dot_pos)
             self.waypoints.append(standoff)
-            
-        print("waypoints", self.waypoints)
+
+            if i%5 == 0:
+                self.waypoints.append(self.paint_location_standoff)
+                self.waypoints.append(self.paint_location_dip)
+                self.waypoints.append(self.paint_location_standoff)
+
+
+        # print("waypoints", self.waypoints)
         # from IPython import embed; embed()
         # oirginal waypoints = self.waypoints
         # up motion
-        common_waypoint = Pose()
-        common_waypoint.position.x = 0.45354
-        common_waypoint.position.y = -0.19164
-        common_waypoint.position.z = self.z
+        # common_waypoint = Pose()
+        # common_waypoint.position.x = 0.45354
+        # common_waypoint.position.y = -0.19164
+        # common_waypoint.position.z = self.z
             
         # from IPython import embed; embed()
         # wp1.position.x = 0.40569
