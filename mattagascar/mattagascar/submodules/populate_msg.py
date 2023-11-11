@@ -80,12 +80,18 @@ class PopulateMsgs():
         cart_pos_rqst.header.stamp = self.node.get_clock().now().to_msg()
         cart_pos_rqst.header.frame_id = frame_id
         
-        cart_pos_rqst.start_state = self.set_RobotState(frame_id, joint_names, position)
+        # cart_pos_rqst.start_state = self.set_RobotState(frame_id, joint_names, position)
         cart_pos_rqst.group_name = group_name
-        # cart_pos_rqst.link_name = link_name
-        cart_pos_rqst.waypoints = waypoints #this must be a list of Pose() msgs
-        # cart_pos_rqst.max_step = max_step
+        cart_pos_rqst.link_name = 'panda_link8'
+        cart_pos_rqst.waypoints = waypoints  # this must be a list of Pose() msgs
+        max_step = 0.1
+        cart_pos_rqst.max_velocity_scaling_factor = 0.25
+        cart_pos_rqst.max_acceleration_scaling_factor = 0.25
+        cart_pos_rqst.max_cartesian_speed = 0.15
+        cart_pos_rqst.cartesian_speed_limited_link = 'panda_link8'
+        cart_pos_rqst.max_step = max_step
         # cart_pos_rqst.jump_threshold = jump_threshold 
+        return cart_pos_rqst
 
     
     # def set_CartesianTrajectoryMsgs(self, waypoints, dT, frame_id):
@@ -107,10 +113,11 @@ class PopulateMsgs():
     #     dt_msg.sec = dt
     #     ctp_msg.time_from_start = dt_msg
     #     return ctp_msg
-
     def set_CartesianPoint(self, position):
         cp_msg = CartesianPoint()
-        cp_msg.pose = self.set_PoseMsgs_position(position)
+        orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
+        # orientation = Quaternion(x=0.92244, y=-0.38613, z=-0.00235, w=-0.000504)
+        cp_msg.pose = self.set_PoseMsgs(position, orientation)
         return cp_msg
     
     def set_PoseMsgs_position(self, position):
