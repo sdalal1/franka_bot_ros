@@ -93,6 +93,7 @@ class Wrapper:
                                 "panda_joint6",
                                 "panda_joint7",
                                 ]
+            self.ee_joint_names = ['panda_link8', 'panda_rightfinger', 'panda_leftfinger']
             self.joint_states = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             self.joint_sub = self.node.create_subscription(
                 JointState, "franka/joint_states", self.cb_joint_state, 10)
@@ -177,15 +178,14 @@ class Wrapper:
         frac = future.result().fraction
         print("fraction", frac)
 
-        traj_motion = ExecuteTrajectory().Goal
+        traj_motion = ExecuteTrajectory.Goal()
         traj_motion.trajectory = robot_traj
 
         self.node.get_logger().info("Executing Cartesian Trajectory ...")
-        if frac is not None or frac !=1.0:
+        if frac is not None or frac != 1.0:
             print(f'Fraction: {frac}')
         future = self.execute_action.send_goal_async(traj_motion)
         future.add_done_callback(self.future_execute_callback)
-
 
 
     def goal_path_cb(self, future):
@@ -245,9 +245,9 @@ class Wrapper:
     def get_execute_result_cb(self, future):
         """Change the state to done."""
         self.state = FRANKA.DONE
-
-
     # compute_cartesian_path(waypoints, eef_step = 0.01, jump_threshold = 0.0)
+
+
     def plan_path_cartesian(self, waypoints, dT):
         """
         Cartesian path directly by specifying a list of waypoints for the end-effector to go through.
@@ -259,9 +259,10 @@ class Wrapper:
         # position = 
         # jump_theshold =
         # dT = self.node.get_clock().now().to_msg()
-        start_state =  [0.30714, 0.0, 0.5951]
+        # start_state =  [0.40401, 0.25614, 0.57185]
+        start_state = [0.30724, 0.00054, 0.59104]
         # dT = [1.0, 2.0, 3.0]
-        cartesian_msgs_request = self.pop_msgs.set_GetCartesianPositionRqt(self.robot_type, frame_id,start_state, self.joint_names, waypoints)
+        cartesian_msgs_request = self.pop_msgs.set_GetCartesianPositionRqt(self.robot_type, frame_id, start_state, self.ee_joint_names, waypoints)
         print("cartesian msg", cartesian_msgs_request)
         # THIS IS INCORRECT BECAUSE NEED TO PASS IN THE MESSAGES IN THE POP MES
         self.cartesian_future = self.cartesian_srv_client.call_async(cartesian_msgs_request)

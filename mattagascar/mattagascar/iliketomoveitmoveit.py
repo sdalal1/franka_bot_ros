@@ -46,7 +46,7 @@ class ILikeToMoveItMoveIt(Node):
         self.joint_angle = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.joint_angle_panda = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-        self.pose = [0.47225, 0.17125, 0.055]
+        # self.pose = [0.47225, 0.17125, 0.055]
         self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
 
         self.state = State.INITIALIZE
@@ -59,14 +59,32 @@ class ILikeToMoveItMoveIt(Node):
         wp1 = Pose()
         wp2 = Pose()
         wp3 = Pose()
-        wp1.position.z = -0.2
-        wp2.position.y = -0.2
-        wp2.position.z = 0.2
-        wp3.position.y = 0.2
-        wp3.position.x = -0.2
+
+        wp1.position.x = 0.40569
+        wp1.position.y = -0.01668
+        wp1.position.z = 0.21811
+        wp1.orientation = self.orientation
+        
+        wp2.position.x = 0.45354
+        wp2.position.y = -0.19164
+        wp2.position.z = 0.21811
+        wp2.orientation = self.orientation
+
+        wp3.position.x = 0.30669
+        wp3.position.y = 0.00000
+        wp3.position.z = 0.59108
+        wp3.orientation = self.orientation
+
+        # wp1.position.z = -0.2
+        # wp2.position.y = -0.2
+        # wp2.position.z = 0.2
+        # wp3.position.y = 0.2
+        # wp3.position.x = -0.2
         self.waypoints.append(wp1)
         self.waypoints.append(wp2)
         self.waypoints.append(wp3)
+
+        # self.orientation = 
         
         # geometry_msgs::Pose target_pose3 = move_group.getCurrentPose().pose;
 
@@ -91,7 +109,7 @@ class ILikeToMoveItMoveIt(Node):
             self.get_logger().info('IN INITIALIZE', once=True)
             # self.KingJulien.plan_path_to_position_orientation(
             #     self.pose, self.orientation)
-            dt = [1.0, 2.0, 3.0]
+            dt = [10.0, 20.0, 30.0]
             self.KingJulien.plan_path_cartesian(self.waypoints, dt)
             # self.state = State.PLANNING
             self.get_logger().info('State to waiting for compute', once=True)
