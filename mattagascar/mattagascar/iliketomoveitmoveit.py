@@ -5,6 +5,8 @@ from rclpy.node import Node
 from geometry_msgs.msg import Quaternion, Pose
 from .submodules.frankastein import Wrapper, Gripper, FRANKA
 from enum import Enum, auto
+import numpy as np
+import csv
 
 
 class State(Enum):
@@ -53,55 +55,50 @@ class ILikeToMoveItMoveIt(Node):
         self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
+        # from IPython import embed; embed()
+        coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points.csv', unpack= True, delimiter=',')
+        coordinate_list = []
 
-        # the waypoints we want the robot to take
+        for x, y in zip(coordinate_x, coordinate_y):
+            point = (x,y)
+            coordinate_list.append(point)
+
         self.waypoints = []
-        wp1 = Pose()
-        wp2 = Pose()
-        wp3 = Pose()
 
-        wp1.position.x = 0.40569
-        wp1.position.y = -0.01668
-        wp1.position.z = 0.21811
-        wp1.orientation = self.orientation
-        
-        wp2.position.x = 0.45354
-        wp2.position.y = -0.19164
-        wp2.position.z = 0.21811
-        wp2.orientation = self.orientation
+        self.z = 0.21811
 
-        wp3.position.x = 0.30669
-        wp3.position.y = 0.00000
-        wp3.position.z = 0.59108
-        wp3.orientation = self.orientation
+        # self.waypoints = [wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8]
 
-        # wp1.position.z = -0.2
-        # wp2.position.y = -0.2
-        # wp2.position.z = 0.2
-        # wp3.position.y = 0.2
-        # wp3.position.x = -0.2
-        self.waypoints.append(wp1)
-        self.waypoints.append(wp2)
-        self.waypoints.append(wp3)
+        for cooridainte in coordinate_list:
+            waypoint = Pose()
+            # from IPython import embed; embed()
+            waypoint.position.x = cooridainte[0]
+            waypoint.position.y = cooridainte[1]
+            waypoint.position.z = self.z
+            waypoint.orientation = self.orientation
+            self.waypoints.append(waypoint)
+        # from IPython import embed; embed()
+        # wp1.position.x = 0.40569
+        # wp1.position.y = -0.01668
+        # wp1.position.z = 0.21811
+        # wp1.orientation = self.orientation # for the ee
 
-        # self.orientation = 
-        
-        # geometry_msgs::Pose target_pose3 = move_group.getCurrentPose().pose;
+        # wp2.position.x = 0.45354
+        # wp2.position.y = -0.19164
+        # wp2.position.z = 0.21811
+        # wp2.orientation = self.orientation
 
-        # waypoints.push_back(target_pose3);
+        # wp3.position.x = 0.30669
+        # wp3.position.y = 0.00000
+        # wp3.position.z = 0.59108
+        # wp3.orientation = self.orientation
 
-        # target_pose3.position.z -= 0.2;
-        # waypoints.push_back(target_pose3);  // down
 
-        # target_pose3.position.y -= 0.2;
-        # waypoints.push_back(target_pose3);  // right
+        # self.waypoints.append(wp1)
+        # self.waypoints.append(wp2)
+        # self.waypoints.append(wp3)
 
-        # target_pose3.position.z += 0.2;
-        # target_pose3.position.y += 0.2;
-        # target_pose3.position.x -= 0.2;
-        # waypoints.push_back(target_pose3);  // up and left
 
-        
     def timer_callback(self):
         self.get_logger().info(f"\n\tNOTE: State of King Julien: {self.KingJulien.state}")
         # every state wrapper has, need an if statement for each state
@@ -137,9 +134,10 @@ class ILikeToMoveItMoveIt(Node):
         #         )
         #     print("here")
         #     print(self.state)
-        #     self.pose = [0.2, 0.5, 0.6]
-        #     self.orientation = Quaternion(x=0.913161, y=-0.406408, z=-0.00135, w=0.0278)
-        #     self.KingJulien.plan_path_to_position_orientation(self.pose, self.orientation)
+        #     # self.pose = [0.2, 0.5, 0.6]
+        #     # self.orientation = Quaternion(x=0.913161, y=-0.406408, z=-0.00135, w=0.0278)
+        #     # self.KingJulien.plan_path_to_position_orientation(self.pose, self.orientation)
+        #     self.KingJulien.plan_path_cartesian([self.waypoints[1]], dt)
         #     self.state = State.PLANNING1
 
         # elif self.state == State.PLANNING1:
