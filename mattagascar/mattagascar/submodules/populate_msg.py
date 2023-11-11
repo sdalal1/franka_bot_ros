@@ -86,9 +86,9 @@ class PopulateMsgs():
         cart_pos_rqst.waypoints = waypoints  # this must be a list of Pose() msgs
         max_step = 0.1
         # not setting these will cause the motion to be fastttttt!
-        cart_pos_rqst.max_velocity_scaling_factor = 0.25
-        cart_pos_rqst.max_acceleration_scaling_factor = 0.25
-        cart_pos_rqst.max_cartesian_speed = 0.15
+        cart_pos_rqst.max_velocity_scaling_factor = 0.15
+        cart_pos_rqst.max_acceleration_scaling_factor = 0.15
+        cart_pos_rqst.max_cartesian_speed = 0.10
         cart_pos_rqst.cartesian_speed_limited_link = 'panda_link8'
         cart_pos_rqst.max_step = max_step
         # cart_pos_rqst.jump_threshold = jump_threshold
