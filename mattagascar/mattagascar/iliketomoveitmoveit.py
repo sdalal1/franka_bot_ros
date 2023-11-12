@@ -45,10 +45,7 @@ class ILikeToMoveItMoveIt(Node):
         self.KingJulien = Wrapper(self, robot_type='panda_manipulator')
         self.Mort = FRANKA
         self.grasping = Gripper(self)
-        self.joint_angle = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.joint_angle_panda = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-        # self.pose = [0.47225, 0.17125, 0.055]
         self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
 
         self.state = State.INITIALIZE
@@ -56,15 +53,17 @@ class ILikeToMoveItMoveIt(Node):
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
         # from IPython import embed; embed()
-        # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_many.csv', unpack= True, delimiter=',')
-        coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
+        coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_many.csv', unpack= True, delimiter=',')
+        # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
+        # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
+        
         coordinate_list = []
 
         for x, y in zip(coordinate_x, coordinate_y):
             point = (x,y)
             coordinate_list.append(point)
 
-        self.waypoints = []
+        self.waypoints = coordinate_list
 
         self.z_standoff = 0.25
         self.z_dot = 0.19
@@ -81,36 +80,39 @@ class ILikeToMoveItMoveIt(Node):
         self.paint_location_dip.position.z = self.z_dot
         self.paint_location_dip.orientation = self.orientation
 
+        self.visited = []
+        self.count = 0
+
 
         # simulating it to go refill on paint
         # x = 0.40275
         # y = 0.43162
         # z = 0.21435
 
-        for i, cooridainte in enumerate(coordinate_list):
+        # for i, cooridainte in enumerate(coordinate_list):
 
-            # if i%5 == 0:
-            standoff = Pose()
-            # from IPython import embed; embed()
-            standoff.position.x = cooridainte[0]
-            standoff.position.y = cooridainte[1]
-            standoff.position.z = self.z_standoff
-            standoff.orientation = self.orientation
+        #     # if i%5 == 0:
+        #     standoff = Pose()
+        #     # from IPython import embed; embed()
+        #     standoff.position.x = cooridainte[0]
+        #     standoff.position.y = cooridainte[1]
+        #     standoff.position.z = self.z_standoff
+        #     standoff.orientation = self.orientation
 
-            dot_pos = Pose()
-            dot_pos.position.x = standoff.position.x
-            dot_pos.position.y = standoff.position.y
-            dot_pos.position.z = self.z_dot
-            dot_pos.orientation = self.orientation
+        #     dot_pos = Pose()
+        #     dot_pos.position.x = standoff.position.x
+        #     dot_pos.position.y = standoff.position.y
+        #     dot_pos.position.z = self.z_dot
+        #     dot_pos.orientation = self.orientation
 
-            self.waypoints.append(standoff)
-            self.waypoints.append(dot_pos)
-            self.waypoints.append(standoff)
+        #     self.waypoints.append(standoff)
+        #     self.waypoints.append(dot_pos)
+        #     self.waypoints.append(standoff)
 
-            if i%5 == 0:
-                self.waypoints.append(self.paint_location_standoff)
-                self.waypoints.append(self.paint_location_dip)
-                self.waypoints.append(self.paint_location_standoff)
+        #     if i%5 == 0:
+        #         self.waypoints.append(self.paint_location_standoff)
+        #         self.waypoints.append(self.paint_location_dip)
+        #         self.waypoints.append(self.paint_location_standoff)
 
 
         # print("waypoints", self.waypoints)
@@ -149,60 +151,55 @@ class ILikeToMoveItMoveIt(Node):
         # every state wrapper has, need an if statement for each state
         if self.state == State.INITIALIZE:
             self.get_logger().info('IN INITIALIZE', once=True)
-            # self.KingJulien.plan_path_to_position_orientation(
-            #     self.pose, self.orientation)
-            dt = [10.0, 20.0, 30.0]
-            self.KingJulien.plan_path_cartesian(self.waypoints, dt)
-            # self.state = State.PLANNING
-            self.get_logger().info('State to waiting for compute', once=True)
+            
+            msg_waypoints = []
 
-        # elif self.state == State.PLANNING:
-        #     self.get_logger().info('IN WAITING FOR COMPUTE', once=True)
-        #     if self.KingJulien.state == self.Mort.EXECUTING:
-        #         self.state = State.EXECUTING
+            standoff = Pose()
+            standoff.position.x = self.waypoints[0][0]
+            standoff.position.y = self.waypoints[0][1]
+            standoff.position.z = self.z_standoff
+            standoff.orientation = self.orientation
 
-        # elif self.state == State.EXECUTING:
-        #     self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItEXECUTING', once=True)
-        #     if self.KingJulien.state == self.Mort.DONE:
-        #         self.get_logger().info('King Julien is done', once=True)
-        #         self.state = State.GRIPPERCLOSE
+            dot_pos = Pose()
+            dot_pos.position.x = standoff.position.x
+            dot_pos.position.y = standoff.position.y
+            dot_pos.position.z = self.z_dot
+            dot_pos.orientation = self.orientation
 
-        # elif self.state == State.GRIPPERCLOSE:
-        #     self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPERCLOSING', once=True)
-        #     self.grasp_close_goal = self.grasping.create_close_grasp_msg()
-        #     if self.grasping.state == self.Mort.CLOSE:
-        #         self.state = State.WAYPOINT1
+            msg_waypoints.append(standoff)
+            msg_waypoints.append(dot_pos)
+            msg_waypoints.append(standoff)
+            self.state = State.EXECUTING
 
-        # elif self.state == State.WAYPOINT1:
-        #     self.get_logger().info(
-        #         f"\n\tNOTE: State of King Julien: {self.KingJulien.state}", once=True
-        #         )
-        #     print("here")
-        #     print(self.state)
-        #     # self.pose = [0.2, 0.5, 0.6]
-        #     # self.orientation = Quaternion(x=0.913161, y=-0.406408, z=-0.00135, w=0.0278)
-        #     # self.KingJulien.plan_path_to_position_orientation(self.pose, self.orientation)
-        #     self.KingJulien.plan_path_cartesian([self.waypoints[1]], dt)
-        #     self.state = State.PLANNING1
+            self.visited.append(self.waypoints[0])
+            self.waypoints.pop(0)
+            if not self.waypoints:
+                self.state = State.DONE
 
-        # elif self.state == State.PLANNING1:
-        #     self.get_logger().info('IN WAITING FOR COMPUTE', once=True)
-        #     if self.KingJulien.state == self.Mort.EXECUTING:
-        #         self.state = State.EXECUTING1
+            if self.count % 5 == 0:
+                # NOTE: needs paint
+                # NOTE: simulating for now until using cv (cv will tells us when to refill)
+                msg_waypoints.append(self.paint_location_standoff)
+                msg_waypoints.append(self.paint_location_dip)
+                msg_waypoints.append(self.paint_location_standoff)
 
-        # elif self.state == State.EXECUTING1:
-        #     self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItEXECUTING', once=True)
-        #     if self.KingJulien.state == self.Mort.DONE:
-        #         self.get_logger().info('King Julien is done', once=True)
-        #         self.state = State.GRIPPEROPEN
+            # from IPython import embed; embed()
+            self.KingJulien.plan_path_cartesian(msg_waypoints)
+            self.get_logger().info('Sent Waypoint msg, set state to EXECUTING', once=True)
+            self.state = State.PLANNING
+        
+        elif self.state == State.PLANNING:
+            if self.KingJulien.state == self.Mort.EXECUTING:
+                self.state = State.EXECUTING
+        
+        elif self.state == State.EXECUTING:
+            self.get_logger().info('Waiting for Execution to be done', once=True)
+            if self.KingJulien.state == self.Mort.DONE:
+                self.count += 1
+                self.state = State.INITIALIZE
 
-        # elif self.state == State.GRIPPEROPEN:
-        #     self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPERCLOSING', once=True)
-        #     self.grasp_open_goal = self.grasping.create_open_grasp_msg()
-        #     if self.grasping.state == self.Mort.OPEN:
-        #         self.state = State.DONE
-        #         # to not cause it to open and close twice
-        #         self.grasping.state = self.Mort.DONE
+        elif self.state == State.DONE:
+            self.get_logger().info('DONE full painting', once=True)
 
 
 def main(args=None):

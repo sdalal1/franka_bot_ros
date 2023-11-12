@@ -184,8 +184,14 @@ class Wrapper:
         self.node.get_logger().info("Executing Cartesian Trajectory ...")
         if frac is not None or frac != 1.0:
             print(f'Fraction: {frac}')
-        future = self.execute_action.send_goal_async(traj_motion)
-        future.add_done_callback(self.future_execute_callback)
+        if traj_motion:
+            future = self.execute_action.send_goal_async(traj_motion)
+            future.add_done_callback(self.future_execute_callback)
+            self.state = FRANKA.EXECUTING
+
+        else:
+            self.node.get_logger().info('Path not found in Frankastein')
+            self.state = FRANKA.WAITING
 
 
     def goal_path_cb(self, future):
@@ -248,31 +254,15 @@ class Wrapper:
     # compute_cartesian_path(waypoints, eef_step = 0.01, jump_threshold = 0.0)
 
 
-    def plan_path_cartesian(self, waypoints, dT):
+    def plan_path_cartesian(self, waypoints):
         """
         Cartesian path directly by specifying a list of waypoints for the end-effector to go through.
         """
         # z = 0.21811
 
-        # for waypoint in waypoints: 
-        #     action_dot = []
-        #     standoff = Pose()
-        #     standoff.position.x = waypoint.position.x
-        #     standoff.position.y = waypoint.position.y
-        #     standoff.position.z = z
-
-        #     dot_pos = Pose()
-        #     dot_pos.position.x = waypoint.position.x
-        #     dot_pos.position.y = waypoint.position.y
-        #     dot_pos.position.z = 0.06
-
-        #     action_dot.append(standoff)
-        #     action_dot.append(dot_pos)
-        #     action_dot.append(standoff)
-
         frame_id = 'panda_link0'
         # link_name = 
-        # max_step =
+        # max_step =s
         # jump_theshold = '
         # position = 
         # jump_theshold =
