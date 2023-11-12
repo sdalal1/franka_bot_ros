@@ -84,74 +84,12 @@ class ILikeToMoveItMoveIt(Node):
         self.count = 0
 
 
-        # simulating it to go refill on paint
-        # x = 0.40275
-        # y = 0.43162
-        # z = 0.21435
-
-        # for i, cooridainte in enumerate(coordinate_list):
-
-        #     # if i%5 == 0:
-        #     standoff = Pose()
-        #     # from IPython import embed; embed()
-        #     standoff.position.x = cooridainte[0]
-        #     standoff.position.y = cooridainte[1]
-        #     standoff.position.z = self.z_standoff
-        #     standoff.orientation = self.orientation
-
-        #     dot_pos = Pose()
-        #     dot_pos.position.x = standoff.position.x
-        #     dot_pos.position.y = standoff.position.y
-        #     dot_pos.position.z = self.z_dot
-        #     dot_pos.orientation = self.orientation
-
-        #     self.waypoints.append(standoff)
-        #     self.waypoints.append(dot_pos)
-        #     self.waypoints.append(standoff)
-
-        #     if i%5 == 0:
-        #         self.waypoints.append(self.paint_location_standoff)
-        #         self.waypoints.append(self.paint_location_dip)
-        #         self.waypoints.append(self.paint_location_standoff)
-
-
-        # print("waypoints", self.waypoints)
-        # from IPython import embed; embed()
-        # oirginal waypoints = self.waypoints
-        # up motion
-        # common_waypoint = Pose()
-        # common_waypoint.position.x = 0.45354
-        # common_waypoint.position.y = -0.19164
-        # common_waypoint.position.z = self.z
-            
-        # from IPython import embed; embed()
-        # wp1.position.x = 0.40569
-        # wp1.position.y = -0.01668
-        # wp1.position.z = 0.21811
-        # wp1.orientation = self.orientation # for the ee
-
-        # wp2.position.x = 0.45354
-        # wp2.position.y = -0.19164
-        # wp2.position.z = 0.21811
-        # wp2.orientation = self.orientation
-
-        # wp3.position.x = 0.30669
-        # wp3.position.y = 0.00000
-        # wp3.position.z = 0.59108
-        # wp3.orientation = self.orientation
-
-
-        # self.waypoints.append(wp1)
-        # self.waypoints.append(wp2)
-        # self.waypoints.append(wp3)
-
-
     def timer_callback(self):
         self.get_logger().info(f"\n\tNOTE: State of King Julien: {self.KingJulien.state}")
         # every state wrapper has, need an if statement for each state
         if self.state == State.INITIALIZE:
             self.get_logger().info('IN INITIALIZE', once=True)
-            
+
             msg_waypoints = []
 
             standoff = Pose()
@@ -187,11 +125,11 @@ class ILikeToMoveItMoveIt(Node):
             self.KingJulien.plan_path_cartesian(msg_waypoints)
             self.get_logger().info('Sent Waypoint msg, set state to EXECUTING', once=True)
             self.state = State.PLANNING
-        
+
         elif self.state == State.PLANNING:
             if self.KingJulien.state == self.Mort.EXECUTING:
                 self.state = State.EXECUTING
-        
+
         elif self.state == State.EXECUTING:
             self.get_logger().info('Waiting for Execution to be done', once=True)
             if self.KingJulien.state == self.Mort.DONE:
