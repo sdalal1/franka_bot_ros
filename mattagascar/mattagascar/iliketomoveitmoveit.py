@@ -7,6 +7,7 @@ from .submodules.frankastein import Wrapper, Gripper, FRANKA
 from enum import Enum, auto
 import numpy as np
 import csv
+from listen_apriltags_interface.msg import Loc
 
 
 class State(Enum):
@@ -57,11 +58,13 @@ class ILikeToMoveItMoveIt(Node):
         self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
+        self.apriltagsub = self.create_subscription(Loc,"paint_loc", self.apriltagloc_cb, 10)
         # from IPython import embed; embed()
         coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
-        
+        self.brushlocs = {}
+
         coordinate_list = []
 
         for x, y in zip(coordinate_x, coordinate_y):
@@ -86,35 +89,73 @@ class ILikeToMoveItMoveIt(Node):
         self.paint_location_dip.position.z = self.z_dot
         self.paint_location_dip.orientation = self.orientation
 
+        self.current_color = 'red'
+
         # paintbrush location
         # standoff pose
-        self.pickup_loc = Pose()
-        # this is the position of the paint pallete 
-        self.pickup_loc.position.x = 0.44337
-        self.pickup_loc.position.y = 0.244664
-        self.pickup_loc.position.z = self.z_standoff
-        self.pickup_loc.orientation = self.orientation
+        # self.pickup_loc = Pose()
+        # # this is the position of the paint pallete 
+        # self.pickup_loc.position.x = 0.44337
+        # self.pickup_loc.position.y = 0.244664
+        # self.pickup_loc.position.z = self.z_standoff
+        # self.pickup_loc.orientation = self.orientation
+
 
         # this is the robot going to fetch paint
-        self.pickup_dip = Pose()
-        self.pickup_dip.position.x = self.pickup_loc.position.x
-        self.pickup_dip.position.y = self.pickup_loc.position.y
-        self.pickup_dip.position.z = 0.18
-        self.pickup_dip.orientation = self.orientation
 
-        self.pick_msg_wpts = []
-        self.pick_msg_wpts.append(self.pickup_loc)
-        self.pick_msg_wpts.append(self.pickup_dip)
+
+        # self.pick_msg_wpts = []
+        # self.pick_msg_wpts.append(self.pickup_loc)
+        # self.pick_msg_wpts.append(self.pickup_dip)
 
         #
         self.visited = []
         self.count = 0
 
+        
+
+    def apriltagloc_cb(self, msg:Loc):
+        # message type for the paint brush locations
+        self.get_logger().info(f'IN APRILTAGLOC_CB {msg}')
+        try:            
+            self.brushlocs["red"] = msg.red
+            self.brushlocs["blue"] = msg.blue
+            self.brushlocs["green"] = msg.green
+            self.brushlocs["orange"] = msg.orange
+            self.brushlocs["yellow"] = msg.yellow
+            self.brushlocs["palete"] = msg.palete
+        except: 
+            self.get_logger().info('Brush Locations Not Initlaized Yet')
+
+
     def timer_callback(self):
         if self.state == State.PICKUP:
             # go to paint brush location and dip down
-            self.KingJulien.plan_path_cartesian(self.pick_msg_wpts)
-            self.state = State.PLANNING_GRIPPER
+
+            # # this is the position of the paint pallete 
+            try:
+                # standoff pose
+                print("in the 1st try")
+                self.pickup_loc = Pose()
+                self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
+                self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
+                self.pickup_loc.position.z = 0.25
+                self.pickup_loc.orientation = self.orientation
+
+                self.pickup_dip = Pose()
+                self.pickup_dip.position.x = self.pickup_loc.position.x
+                self.pickup_dip.position.y = self.pickup_loc.position.y
+                self.pickup_dip.position.z = 0.18
+                self.pickup_dip.orientation = self.orientation
+                self.pick_msg_wpts = [self.pickup_loc, self.pickup_dip]
+                self.KingJulien.plan_path_cartesian(self.pick_msg_wpts)
+                self.state = State.PLANNING_GRIPPER
+                # self.state = State.DONE
+
+            except: 
+                # gets stuck here
+                self.get_logger().info('Brush Locations in timer Not Initlaized Yet')
+
 
         elif self.state == State.PLANNING_GRIPPER:
             self.get_logger().info('IN PLANNING GRIPPER', once=True)
@@ -136,9 +177,22 @@ class ILikeToMoveItMoveIt(Node):
 
         elif self.state == State.PICKBRUSH:
             # this is the position of the paint brush
-            self.pickup = [0.44337, 0.244664, 0.25]
-            self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
-            self.state = State.UP
+            # self.pickup = [0.44337, 0.244664, 0.25]
+
+             # # this is the position of the paint pallete 
+            try:
+                # standoff pose
+                self.pickup = Pose()
+                self.pickup.position.x = self.brushlocs[self.current_color][0]
+                self.pickup.position.y = self.brushlocs[self.current_color][1]
+                self.pickup.position.z = 0.25
+                self.pickup.orientation = self.orientation
+
+                self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
+                self.state = State.UP
+            except: 
+                self.get_logger().info('Brush Locations in timer 2 Not Initlaized Yet')
+
 
         elif self.state == State.UP:
             if self.KingJulien.state == self.Mort.EXECUTING:

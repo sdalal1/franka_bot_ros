@@ -5,6 +5,8 @@ from listen_apriltags_interface.msg import Loc
 from tf2_ros.transform_listener import TransformListener
 from tf2_ros.buffer import Buffer
 from tf2_ros import TransformException
+from tf2_ros import StaticTransformBroadcaster, TransformBroadcaster
+from geometry_msgs.msg import TransformStamped
 from enum import Enum, auto
 import numpy as np
 
@@ -28,6 +30,12 @@ class listener(Node):
         # initialized transform
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
+        # self.broadcaster = StaticTransformBroadcaster(self)
+        self.broadcaster = TransformBroadcaster(self, qos=10)
+        
+        self.robot_to_tag = TransformStamped()
+        self.robot_to_tag.header.frame_id = "calibration"
+        self.robot_to_tag.child_frame_id = "panda_link0"
 
         self.timer = self.create_timer(0.05, self.timer_callback)
 
@@ -38,16 +46,30 @@ class listener(Node):
         self.brush_tag_offset_y = 0.05
         self.bw_brush_inc_y = 0.05
 
+        # self.robot_to_tag = TransformStamped()
+        # self.robot_to_tag.header.frame_id = "calibration"
+        # self.robot_to_tag.child_frame_id = "panda_link0"
+        # self.robot_to_tag.transform.translation.x = self.base_to_tag[0]
+        # self.robot_to_tag.transform.translation.y = self.base_to_tag[1]
+        # self.robot_to_tag.transform.translation.z = self.base_to_tag[2]
+        # self.robot_to_tag.header.stamp = self.get_clock().now().to_msg()
+        # self.broadcaster.sendTransform(self.robot_to_tag)
 
         self.state = State.CALIBRATING
 
     def timer_callback(self):
         """Print the transform from platform to brick."""
 
+        self.robot_to_tag.transform.translation.x = self.base_to_tag[0]
+        self.robot_to_tag.transform.translation.y = self.base_to_tag[1]
+        self.robot_to_tag.transform.translation.z = self.base_to_tag[2]
+        self.robot_to_tag.header.stamp = self.get_clock().now().to_msg()
+        self.broadcaster.sendTransform(self.robot_to_tag)
+
         if self.state == State.CALIBRATING:
             
             camera_frame = "camera_color_optical_frame"
-            tag_frame6 = "tag36h11:0"
+            tag_frame6 = "calibration"
             # robo_ee_frame = "panda_link8"
             # robo_base_frame = "panda_link0"
 
@@ -77,8 +99,8 @@ class listener(Node):
 
         if self.state == State.TRANSFORMING:
             camera_frame = "camera_color_optical_frame"
-            tag_frame1 = "tag36h11:1"
-            tag_frame5 = "tag36h11:2"
+            tag_frame1 = "brush"
+            tag_frame5 = "paint"
 
             # initialize message types
             paint = Loc()
@@ -97,9 +119,9 @@ class listener(Node):
                 paint.red = [self.robot_to_brush[0] + self.brush_tag_offset_x, self.robot_to_brush[1] + self.brush_tag_offset_y, self.robot_to_brush[2]]
                 paint.orange = [paint.red[0], paint.red[1] + self.bw_brush_inc_y, paint.red[2]]
                 paint.yellow = [paint.orange[0], paint.orange[1] + self.bw_brush_inc_y, paint.orange[2]]
-                paint.green = [paint.green[0], paint.green[1] + self.bw_brush_inc_y, paint.green[2]]
-                paint.blue = [paint.blue[0], paint.blue[1] + self.bw_brush_inc_y, paint.blue[2]]
-                paint.purple = [paint.purple[0], paint.purple[1] + self.bw_brush_inc_y, paint.purple[2]]
+                paint.green = [paint.yellow[0], paint.yellow[1] + self.bw_brush_inc_y, paint.yellow[2]]
+                paint.blue = [paint.green[0], paint.green[1] + self.bw_brush_inc_y, paint.green[2]]
+                paint.purple = [paint.blue[0], paint.blue[1] + self.bw_brush_inc_y, paint.blue[2]]
 
 
             except TransformException as ex:
@@ -136,14 +158,14 @@ class listener(Node):
         # robot + camera
 
         Px = Pc[0] - Pr[0]
-        Py = Pc[1] + Pr[1]
-        Pz = Pc[2] - Pr[2]
+        Py = -Pc[1] - Pr[1]
+        Pz = - Pc[2] - Pr[2]
 
         return [Px, Py, Pz]
     
     def in_robot_frame(self, in_camera_frame):
 
-        robot_frame = [in_camera_frame[0] - self.camera_to_base[0], in_camera_frame[1] - self.camera_to_base[1], in_camera_frame[2] - self.camera_to_base]
+        robot_frame = [in_camera_frame[0] - self.camera_to_base[0], in_camera_frame[1] - self.camera_to_base[1], in_camera_frame[2] - self.camera_to_base[2]]
 
         return robot_frame
 

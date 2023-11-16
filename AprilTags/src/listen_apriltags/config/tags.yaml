@@ -20,9 +20,9 @@
 
     # (optional) list of tags
     # If defined, 'frames' and 'sizes' must have the same length as 'ids'.
-    # tag:
-    #   ids:    [0]         # tag IDs for which to publish transform
-    #   frames: ['tag']           # frame names
-    #   sizes:  [0.1]             # tag-specific edge size, overrides the default 'size'
+    tag:
+      ids:    [0, 1, 2]         # tag IDs for which to publish transform
+      frames: ['calibration', 'brush', 'paint']           # frame names
+      sizes:  [0.127, 0.127, 0.127]             # tag-specific edge size, overrides the default 'size'
 
 
