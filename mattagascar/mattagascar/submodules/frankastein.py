@@ -181,10 +181,11 @@ class Wrapper:
         traj_motion = ExecuteTrajectory.Goal()
         traj_motion.trajectory = robot_traj
 
-        self.node.get_logger().info("Executing Cartesian Trajectory ...")
+        # self.node.get_logger().info("Executing Cartesian Trajectory ...")
         if frac is not None or frac != 1.0:
             print(f'Fraction: {frac}')
         if traj_motion:
+            self.node.get_logger().info('\n\tNOTE: Path found in Frankastein')
             future = self.execute_action.send_goal_async(traj_motion)
             future.add_done_callback(self.future_execute_callback)
             self.state = FRANKA.EXECUTING
@@ -223,16 +224,16 @@ class Wrapper:
         self.node.get_logger().info('Result: {0}'.format(self.path))
 
         if self.path:
-            self.node.get_logger().info('\n\tNOTE: Path found in Frankastein')
+            # self.node.get_logger().info('\n\tNOTE: Path found in Frankastein')
 
-            self.node.get_logger().info(f'\n\tState of Frankastein: {self.state}')
+            # self.node.get_logger().info(f'\n\tState of Frankastein: {self.state}')
 
-            self.node.get_logger().info('\n\tCreating Trajectory Message')
+            # self.node.get_logger().info('\n\tCreating Trajectory Message')
 
             self.robot_msg = ExecuteTrajectory.Goal()
             self.robot_msg.trajectory = self.path
 
-            self.node.get_logger().info("Executing the goal ...")
+            # self.node.get_logger().info("Executing the goal ...")
             future = self.execute_action.send_goal_async(self.robot_msg)
             future.add_done_callback(self.future_execute_callback)
             self.state = FRANKA.EXECUTING
@@ -243,7 +244,7 @@ class Wrapper:
 
     def future_execute_callback(self, future):
         """Send the result for execution."""
-        self.node.get_logger().info('In future2_callback')
+        # self.node.get_logger().info('In future2_callback')
         result = future.result()
         future2 = result.get_result_async()
         future2.add_done_callback(self.get_execute_result_cb)
