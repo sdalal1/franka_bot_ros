@@ -8,7 +8,9 @@ from enum import Enum, auto
 import numpy as np
 import csv
 from listen_apriltags_interface.msg import Loc
-
+import tf2_ros
+from tf2_ros.transform_listener import TransformListener
+from tf2_ros.buffer import Buffer
 
 class State(Enum):
     """
@@ -37,6 +39,7 @@ class State(Enum):
     UP = auto()
     EXEC = auto()
     UPPLAN = auto()
+    TEST=auto()
 
 class ILikeToMoveItMoveIt(Node):
     """
@@ -54,7 +57,7 @@ class ILikeToMoveItMoveIt(Node):
 
         self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
 
-        self.state = State.PICKUP
+        self.state = State.TEST
         self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
@@ -90,6 +93,8 @@ class ILikeToMoveItMoveIt(Node):
         self.paint_location_dip.orientation = self.orientation
 
         self.current_color = 'red'
+        self.buffer = Buffer()
+        self.listener = TransformListener(self.buffer, self)
 
         # paintbrush location
         # standoff pose
@@ -111,7 +116,9 @@ class ILikeToMoveItMoveIt(Node):
         #
         self.visited = []
         self.count = 0
-
+        self.paintx = 0.0
+        self.painty = 0.0
+        self.paintz = 0.0
         
 
     def apriltagloc_cb(self, msg:Loc):
@@ -129,6 +136,20 @@ class ILikeToMoveItMoveIt(Node):
 
 
     def timer_callback(self):
+        if self.state == State.TEST:
+            try:
+            # get the latest transform between left and right
+            # (rclpy.time.Time() means get the latest information)
+                trans = self.buffer.lookup_transform("panda_hand", "paint", rclpy.time.Time())
+                self.paintx = trans.transform.translation.x
+                self.painty = trans.transform.translation.y
+                self.paintz = trans.transform.translation.z
+                self.get_logger().info(f"Lookup exception: {self.paintx,self.painty,self.paintz}")
+
+            except tf2_ros.LookupException as e:
+                # the frames don't exist yet
+                self.get_logger().info(f"Lookup exception: {e}")
+                
         if self.state == State.PICKUP:
             # go to paint brush location and dip down
 
@@ -139,6 +160,10 @@ class ILikeToMoveItMoveIt(Node):
                 self.pickup_loc = Pose()
                 self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
                 self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
+                
+                # hardcoded paintbrush location 
+            
+                
                 self.pickup_loc.position.z = 0.25
                 self.pickup_loc.orientation = self.orientation
 
