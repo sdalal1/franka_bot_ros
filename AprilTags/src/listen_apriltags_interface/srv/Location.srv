@@ -1,0 +1,7 @@
+# Recieve the location of the brushes 
+
+---
+float64[] red   # x,y,z position of the red brush from april tag
+float64[] blue  # x,y,z position of the blue brush from april tag
+float64[] green 
+float64[] yellow

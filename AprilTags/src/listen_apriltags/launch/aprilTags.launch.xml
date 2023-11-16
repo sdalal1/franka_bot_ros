@@ -1,0 +1,27 @@
+<launch>
+
+    <arg name="rviz_config" default="rviz_config.rviz"/>
+
+    <!-- realsense -->
+    <include file="$(find-pkg-share realsense2_camera)/launch/rs_launch.py">
+        <arg name="depth_module.profile" value ="1280x720x30"/>
+        <arg name="pointcloud.enable" value="true"/>
+    </include>
+
+    <!-- image proc -->
+    <include file="$(find-pkg-share image_proc)/launch/image_proc.launch.py"/>
+
+    <!-- apriltags -->
+    <node pkg="apriltag_ros" exec="apriltag_node">
+        <param from="$(find-pkg-share listen_apriltags)/tags.yaml"/>
+        <remap from="/image_rect/compressed" to="/camera/color/image_raw/compressed"/>
+        <remap from="/camera_info" to="/camera/color/camera_info"/>
+    </node>
+
+    <!-- listener -->
+    <node pkg="listen_apriltags" exec="listener" name="listener"/>
+
+    <!-- rviz -->
+    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share listen_apriltags)/$(var rviz_config)"/>
+
+</launch>
