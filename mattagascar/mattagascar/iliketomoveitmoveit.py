@@ -42,6 +42,8 @@ class State(Enum):
     UPPLAN = auto()
     TEST = auto()
     START = auto()
+    PLANHOME = auto()
+    EXECUTING2 = auto()
 
 class ILikeToMoveItMoveIt(Node):
     """
@@ -67,14 +69,16 @@ class ILikeToMoveItMoveIt(Node):
         self.apriltagsub = self.create_subscription(Loc,"paint_loc", self.apriltagloc_cb, 10)
         
         # from IPython import embed; embed()
-        coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
+        # coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
+        coordinate_x, coordinate_y = np.loadtxt('fiona.csv', unpack= True, delimiter=',')
+
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
         
         coordinate_list = []
         self.brushlocs = {}
 
-        for x, y in zip(coordinate_x, coordinate_y):
+        for x, y in zip(coordinate_x[:3], coordinate_y[:3]):
             point = (x,y)
             coordinate_list.append(point)
 
@@ -87,8 +91,8 @@ class ILikeToMoveItMoveIt(Node):
         #varibles for z
         self.z_brush_standoff = 0.25
         self.z_paint_standoff = 0.4
-        self.z_brush_dot = 0.19
-        self.z_paint_dip = 0.25
+        self.z_brush_dot = 0.13
+        self.z_paint_dip = 0.15
         self.z_brush_dip = 0.18
         self.z_dot_standoff = 0.25
         
@@ -167,7 +171,11 @@ class ILikeToMoveItMoveIt(Node):
     def timer_callback(self):
         if self.state == State.START:
             self.get_logger().info("Making sure we start here all the time")
-            self.state = State.PICKUP
+            start = input("Enter s to begin: " )
+            if start == "s":
+                self.state = State.PICKUP
+            else:
+                print("need to input a command to start")
 
         if self.state == State.TEST:
             try:
@@ -253,43 +261,50 @@ class ILikeToMoveItMoveIt(Node):
             self.get_logger().info('IN INITIALIZE', once=True)
 
             msg_waypoints = []
-
-            standoff = Pose()
-            standoff.position.x = self.waypoints[0][0]
-            standoff.position.y = self.waypoints[0][1]
-            standoff.position.z = self.z_dot_standoff
-            standoff.orientation = self.orientation
-
-            dot_pos = Pose()
-            dot_pos.position.x = standoff.position.x
-            dot_pos.position.y = standoff.position.y
-            dot_pos.position.z = self.z_brush_dot
-            dot_pos.orientation = self.orientation
-
-            msg_waypoints.append(standoff)
-            msg_waypoints.append(dot_pos)
-            msg_waypoints.append(standoff)
-            self.state = State.EXECUTING
-
-            self.visited.append(self.waypoints[0])
-            self.waypoints.pop(0)
+            
             if not self.waypoints:
+                # return to paintbrush location to drop off at home
+                print("self.waypoints is Empty")
+                self.home = input("Return paintbrush back? (y/n): " )
                 self.state = State.DONE
 
-            if self.count % 5 == 0:
-                # NOTE: needs paint
-                # NOTE: simulating for now until using cv (cv will tells us when to refill)
-                
-                # Updating pallete location from the dictionary to the message we are sending.
-                self.set_PaintLocs()
-                msg_waypoints.append(self.paint_location_standoff)
-                msg_waypoints.append(self.paint_location_dip)
-                msg_waypoints.append(self.paint_location_standoff)
+            else: 
 
-            # from IPython import embed; embed()
-            self.KingJulien.plan_path_cartesian(msg_waypoints)
-            self.get_logger().info('Sent Waypoint msg, set state to EXECUTING', once=True)
-            self.state = State.PLANNING
+                standoff = Pose()
+                standoff.position.x = self.waypoints[0][0]
+                standoff.position.y = self.waypoints[0][1]
+                standoff.position.z = self.z_dot_standoff
+                standoff.orientation = self.orientation
+
+                dot_pos = Pose()
+                dot_pos.position.x = standoff.position.x
+                dot_pos.position.y = standoff.position.y
+                dot_pos.position.z = self.z_brush_dot
+                dot_pos.orientation = self.orientation
+
+                msg_waypoints.append(standoff)
+                msg_waypoints.append(dot_pos)
+                msg_waypoints.append(standoff)
+                self.state = State.EXECUTING
+
+                self.visited.append(self.waypoints[0])
+                self.waypoints.pop(0)
+
+                # can do 15 points before needing to refill
+                if self.count % 10 == 0:
+                    # NOTE: needs paint
+                    # NOTE: simulating for now until using cv (cv will tells us when to refill)
+                    
+                    # Updating pallete location from the dictionary to the message we are sending.
+                    self.set_PaintLocs()
+                    msg_waypoints.append(self.paint_location_standoff)
+                    msg_waypoints.append(self.paint_location_dip)
+                    msg_waypoints.append(self.paint_location_standoff)
+
+                # from IPython import embed; embed()
+                self.KingJulien.plan_path_cartesian(msg_waypoints)
+                self.get_logger().info('Sent Waypoint msg, set state to EXECUTING', once=True)
+                self.state = State.PLANNING
 
         elif self.state == State.PLANNING:
             if self.KingJulien.state == self.Mort.EXECUTING:
@@ -302,7 +317,43 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.INITIALIZE
 
         elif self.state == State.DONE:
-            self.get_logger().info('DONE full painting', once=True)
+            if self.home == 'y':
+                self.get_logger().info('DONE full painting', once=True)
+                # need to go back to paintbrush location
+                self.pickup_loc = Pose()
+                self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
+                self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
+                self.pickup_loc.position.z = self.z_brush_standoff
+                self.pickup_loc.orientation = self.orientation
+            
+                self.pickup_dip = Pose()
+                self.pickup_dip.position.x = self.pickup_loc.position.x
+                self.pickup_dip.position.y = self.pickup_loc.position.y
+                self.pickup_dip.position.z = self.z_brush_dip
+                self.pickup_dip.orientation = self.orientation
+                self.pick_msg_wpts = [self.pickup_loc, self.pickup_dip]
+                self.KingJulien.plan_path_cartesian(self.pick_msg_wpts)
+                self.state = State.PLANHOME
+            elif self.home == 'n':
+                print("Not returning paintbrush and beginning at start")
+                self.state = State.START
+
+        elif self.state == State.PLANHOME:
+            self.get_logger().info('in planning back to paintbrush location', once=True)
+            if self.KingJulien.state == self.Mort.EXECUTING:
+                self.get_logger().info('EXECUTING', once=True)
+                self.state = State.EXECUTING2
+
+        elif self.state == State.EXECUTING2:
+            self.get_logger().info('Waiting for Execution to be done for execute 2', once=True)
+            if self.KingJulien.state == self.Mort.DONE:
+                self.state = State.GRIPPEROPEN
+
+        elif self.state == State.GRIPPEROPEN:
+            self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPEROPENING', once=True)
+            self.grasp_open_goal = self.grasping.create_open_grasp_msg()
+            if self.grasping.state == self.Mort.OPEN:
+                self.state = State.START
 
 
 def main(args=None):
