@@ -12,6 +12,7 @@ import tf2_ros
 from tf2_ros.transform_listener import TransformListener
 from tf2_ros.buffer import Buffer
 
+
 class State(Enum):
     """
 
@@ -39,7 +40,8 @@ class State(Enum):
     UP = auto()
     EXEC = auto()
     UPPLAN = auto()
-    TEST=auto()
+    TEST = auto()
+    START = auto()
 
 class ILikeToMoveItMoveIt(Node):
     """
@@ -57,73 +59,84 @@ class ILikeToMoveItMoveIt(Node):
 
         self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
 
-        self.state = State.TEST
+        # self.state = State.PICKUP
+        self.state = State.START
         self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
         self.apriltagsub = self.create_subscription(Loc,"paint_loc", self.apriltagloc_cb, 10)
+        
         # from IPython import embed; embed()
         coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
-        self.brushlocs = {}
-
+        
         coordinate_list = []
+        self.brushlocs = {}
 
         for x, y in zip(coordinate_x, coordinate_y):
             point = (x,y)
             coordinate_list.append(point)
 
         self.waypoints = coordinate_list
-
-        # paint location
-        self.z_standoff = 0.25
-        self.z_dot = 0.19
-        self.paint_location_standoff = Pose()
-        self.paint_location_standoff.position.x = 0.40275
-        self.paint_location_standoff.position.y = 0.43162
-        self.paint_location_standoff.position.z = self.z_standoff
-        self.paint_location_standoff.orientation = self.orientation
         
-        self.paint_location_dip = Pose()
-        self.paint_location_dip.position.x = 0.40275
-        self.paint_location_dip.position.y = 0.43162
-        # NOTE: we were subtracting 0.05 from the z value and keeping max_step = 0.1 and it was working but once we just decreased max_step, it also worked??
-        self.paint_location_dip.position.z = self.z_dot
-        self.paint_location_dip.orientation = self.orientation
-
         self.current_color = 'red'
         self.buffer = Buffer()
         self.listener = TransformListener(self.buffer, self)
+        
+        #varibles for z
+        self.z_brush_standoff = 0.25
+        self.z_paint_standoff = 0.4
+        self.z_brush_dot = 0.19
+        self.z_paint_dip = 0.25
+        self.z_brush_dip = 0.18
+        self.z_dot_standoff = 0.25
+        
+        # # paint standoff location
+        # self.paint_location_standoff = Pose()
+        # self.paint_location_standoff.position.x = 0.40275
+        # self.paint_location_standoff.position.y = 0.43162
+        # self.paint_location_standoff.position.z = self.z_paint_standoff
+        # self.paint_location_standoff.orientation = self.orientation
+        
+        # # paint dip location
+        # self.paint_location_dip = Pose()
+        # self.paint_location_dip.position.x = 0.40275
+        # self.paint_location_dip.position.y = 0.43162
+        # # NOTE: we were subtracting 0.05 from the z value and keeping max_step = 0.1 and it was working but once we just decreased max_step, it also worked??
+        # self.paint_location_dip.position.z = self.z_paint_dip
+        # self.paint_location_dip.orientation = self.orientation
 
         # paintbrush location
-        # standoff pose
-        # self.pickup_loc = Pose()
-        # # this is the position of the paint pallete 
-        # self.pickup_loc.position.x = 0.44337
-        # self.pickup_loc.position.y = 0.244664
-        # self.pickup_loc.position.z = self.z_standoff
-        # self.pickup_loc.orientation = self.orientation
+        # brush standoff pose
+        self.pickup_loc = Pose()
+        self.pickup_loc.position.x = 0.43337
+        self.pickup_loc.position.y = 0.244664
+        self.pickup_loc.position.z = self.z_brush_standoff
+        self.pickup_loc.orientation = self.orientation
 
 
-        # this is the robot going to fetch paint
+        #brush pickup location
+        self.pickup_dip = Pose()
+        self.pickup_dip.position.x = self.pickup_loc.position.x
+        self.pickup_dip.position.y = self.pickup_loc.position.y
+        self.pickup_dip.position.z = self.z_brush_dip
+        self.pickup_dip.orientation = self.orientation
 
+        self.pick_msg_wpts = []
+        self.pick_msg_wpts.append(self.pickup_loc)
+        self.pick_msg_wpts.append(self.pickup_dip)
 
-        # self.pick_msg_wpts = []
-        # self.pick_msg_wpts.append(self.pickup_loc)
-        # self.pick_msg_wpts.append(self.pickup_dip)
-
-        #
         self.visited = []
         self.count = 0
         self.paintx = 0.0
         self.painty = 0.0
         self.paintz = 0.0
         
-
+        
     def apriltagloc_cb(self, msg:Loc):
         # message type for the paint brush locations
-        self.get_logger().info(f'IN APRILTAGLOC_CB {msg}')
+        # self.get_logger().info(f'IN APRILTAGLOC_CB {msg}')
         try:            
             self.brushlocs["red"] = msg.red
             self.brushlocs["blue"] = msg.blue
@@ -133,23 +146,43 @@ class ILikeToMoveItMoveIt(Node):
             self.brushlocs["palete"] = msg.palete
         except: 
             self.get_logger().info('Brush Locations Not Initlaized Yet')
-
-
+            
+    def set_PaintLocs(self):
+        
+        # paint standoff location
+        self.paint_location_standoff = Pose()
+        self.paint_location_standoff.position.x = self.brushlocs["palete"][0]
+        self.paint_location_standoff.position.y = self.brushlocs["palete"][1]
+        self.paint_location_standoff.position.z = self.z_paint_standoff
+        self.paint_location_standoff.orientation = self.orientation
+        
+        # paint dip location
+        self.paint_location_dip = Pose()
+        self.paint_location_dip.position.x = self.brushlocs["palete"][0]
+        self.paint_location_dip.position.y = self.brushlocs["palete"][1]
+        # NOTE: we were subtracting 0.05 from the z value and keeping max_step = 0.1 and it was working but once we just decreased max_step, it also worked??
+        self.paint_location_dip.position.z = self.z_paint_dip
+        self.paint_location_dip.orientation = self.orientation
+        
     def timer_callback(self):
+        if self.state == State.START:
+            self.get_logger().info("Making sure we start here all the time")
+            self.state = State.PICKUP
+
         if self.state == State.TEST:
             try:
             # get the latest transform between left and right
             # (rclpy.time.Time() means get the latest information)
-                trans = self.buffer.lookup_transform("panda_hand", "paint", rclpy.time.Time())
+                trans = self.buffer.lookup_transform("panda_link0", "brush", rclpy.time.Time())
                 self.paintx = trans.transform.translation.x
                 self.painty = trans.transform.translation.y
                 self.paintz = trans.transform.translation.z
-                self.get_logger().info(f"Lookup exception: {self.paintx,self.painty,self.paintz}")
+                self.get_logger().info(f"Tag Location: {self.paintx,self.painty,self.paintz}")
 
             except tf2_ros.LookupException as e:
                 # the frames don't exist yet
                 self.get_logger().info(f"Lookup exception: {e}")
-                
+
         if self.state == State.PICKUP:
             # go to paint brush location and dip down
 
@@ -160,25 +193,22 @@ class ILikeToMoveItMoveIt(Node):
                 self.pickup_loc = Pose()
                 self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
                 self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
-                
-                # hardcoded paintbrush location 
-            
-                
-                self.pickup_loc.position.z = 0.25
+                self.pickup_loc.position.z = self.z_brush_standoff
                 self.pickup_loc.orientation = self.orientation
-
+                # self.get_logger().info(f'BRUSH LOCATION: {self.pickup_loc.position.x, self.pickup_loc.position.y}')
+            
                 self.pickup_dip = Pose()
                 self.pickup_dip.position.x = self.pickup_loc.position.x
                 self.pickup_dip.position.y = self.pickup_loc.position.y
-                self.pickup_dip.position.z = 0.18
+                self.pickup_dip.position.z = self.z_brush_dip
                 self.pickup_dip.orientation = self.orientation
                 self.pick_msg_wpts = [self.pickup_loc, self.pickup_dip]
                 self.KingJulien.plan_path_cartesian(self.pick_msg_wpts)
+                
                 self.state = State.PLANNING_GRIPPER
                 # self.state = State.DONE
 
             except: 
-                # gets stuck here
                 self.get_logger().info('Brush Locations in timer Not Initlaized Yet')
 
 
@@ -201,23 +231,16 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.PICKBRUSH
 
         elif self.state == State.PICKBRUSH:
-            # this is the position of the paint brush
+            # this is the position of the paint brush; must be taken in as a list
             # self.pickup = [0.44337, 0.244664, 0.25]
-
-             # # this is the position of the paint pallete 
             try:
                 # standoff pose
-                self.pickup = Pose()
-                self.pickup.position.x = self.brushlocs[self.current_color][0]
-                self.pickup.position.y = self.brushlocs[self.current_color][1]
-                self.pickup.position.z = 0.25
-                self.pickup.orientation = self.orientation
-
+                self.pickup = [self.brushlocs[self.current_color][0], self.brushlocs[self.current_color][1], self.z_brush_standoff]
                 self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
                 self.state = State.UP
+
             except: 
                 self.get_logger().info('Brush Locations in timer 2 Not Initlaized Yet')
-
 
         elif self.state == State.UP:
             if self.KingJulien.state == self.Mort.EXECUTING:
@@ -227,7 +250,6 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.INITIALIZE
 
         elif self.state == State.INITIALIZE:
-
             self.get_logger().info('IN INITIALIZE', once=True)
 
             msg_waypoints = []
@@ -235,13 +257,13 @@ class ILikeToMoveItMoveIt(Node):
             standoff = Pose()
             standoff.position.x = self.waypoints[0][0]
             standoff.position.y = self.waypoints[0][1]
-            standoff.position.z = self.z_standoff
+            standoff.position.z = self.z_dot_standoff
             standoff.orientation = self.orientation
 
             dot_pos = Pose()
             dot_pos.position.x = standoff.position.x
             dot_pos.position.y = standoff.position.y
-            dot_pos.position.z = self.z_dot
+            dot_pos.position.z = self.z_brush_dot
             dot_pos.orientation = self.orientation
 
             msg_waypoints.append(standoff)
@@ -257,6 +279,9 @@ class ILikeToMoveItMoveIt(Node):
             if self.count % 5 == 0:
                 # NOTE: needs paint
                 # NOTE: simulating for now until using cv (cv will tells us when to refill)
+                
+                # Updating pallete location from the dictionary to the message we are sending.
+                self.set_PaintLocs()
                 msg_waypoints.append(self.paint_location_standoff)
                 msg_waypoints.append(self.paint_location_dip)
                 msg_waypoints.append(self.paint_location_standoff)
