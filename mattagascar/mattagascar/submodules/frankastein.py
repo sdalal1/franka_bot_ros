@@ -221,7 +221,7 @@ class Wrapper:
         """
         self.node.get_logger().info('In get result cb')
         self.path = motion_plan_future.result().result.planned_trajectory
-        self.node.get_logger().info('Result: {0}'.format(self.path))
+        # self.node.get_logger().info('Result: {0}'.format(self.path))
 
         if self.path:
             # self.node.get_logger().info('\n\tNOTE: Path found in Frankastein')
@@ -363,6 +363,7 @@ class Wrapper:
 
         """
         x, y, z = positions
+        print("hello x, y, z in plan path", x, y, z)
         point = Point(x=x, y=y, z=z)
         pose_stamped = self.pop_msgs.set_PoseStamp(point, orientation)
 
