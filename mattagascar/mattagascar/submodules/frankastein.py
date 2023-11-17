@@ -450,13 +450,14 @@ class Gripper:
     def create_close_grasp_msg(self):
         """Create a close grasp message."""
         grasp_msg = Grasp.Goal()
-        grasp_msg.width = 0.00
+        grasp_msg.width = 0.00  # without block
+        # grasp_msg.width = 0.02  # with block on the stem
         grasp_msg.speed = 50.0
         grasp_msg.epsilon.inner = 0.01
         grasp_msg.epsilon.outer = 0.01
 
         future_gripper = self.gripper_client.send_goal_async(grasp_msg)
-        future_gripper.add_done_callback(self.future_gripper_callback)
+        future_gripper.add_done_callback(self.future_gripper_close_callback)
 
     def create_open_grasp_msg(self):
         """Create an open grasp message."""
@@ -466,18 +467,27 @@ class Gripper:
         grasp_msg.epsilon.inner = 0.01
         grasp_msg.epsilon.outer = 0.01
         future_gripper = self.gripper_client.send_goal_async(grasp_msg)
-        future_gripper.add_done_callback(self.future_gripper_callback)
+        future_gripper.add_done_callback(self.future_gripper_open_callback)
 
-    def future_gripper_callback(self, future):
+    def future_gripper_close_callback(self, future):
         """Send the result for execution."""
-        self.node.get_logger().info('In future2_callback')
+        self.node.get_logger().info('In future2_callback for close', once=True)
         result = future.result()
         future_gripper = result.get_result_async()
-        future_gripper.add_done_callback(self.get_execute_gripper_result_cb)
+        future_gripper.add_done_callback(self.get_execute_gripper_close_result_cb)
 
-    def get_execute_gripper_result_cb(self, future):
+    def future_gripper_open_callback(self, future):
+        """Send the result for execution."""
+        self.node.get_logger().info('In future2_callback for open', once=True)
+        result = future.result()
+        future_gripper = result.get_result_async()
+        future_gripper.add_done_callback(self.get_execute_gripper_open_result_cb)
+
+    def get_execute_gripper_close_result_cb(self, future):
         """Change the state to done."""
-        if self.state == FRANKA.OPEN:
-            self.state = FRANKA.CLOSE
-        elif self.state == FRANKA.CLOSE:
-            self.state = FRANKA.OPEN
+        # if self.state == FRANKA.OPEN:
+        self.state = FRANKA.CLOSE
+
+    def get_execute_gripper_open_result_cb(self, future):
+        # if self.state == FRANKA.CLOSE:
+        self.state = FRANKA.OPEN

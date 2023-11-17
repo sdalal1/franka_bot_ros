@@ -94,9 +94,9 @@ class listener(Node):
 
                 # individual paints:
                 # hard code the axes of april tag, so circles along y axis and1* centered on x axis
-                paint.red = [self.robot_to_brush[0], self.robot_to_brush[1], self.robot_to_brush[2]]
+                # paint.red = [self.robot_to_brush[0], self.robot_to_brush[1], self.robot_to_brush[2]]
                 
-                # paint.red = [self.robot_to_brush[0] + self.brush_tag_offset_x, self.robot_to_brush[1] + self.brush_tag_offset_y, self.robot_to_brush[2]]
+                paint.red = [self.robot_to_brush[0] + self.brush_tag_offset_x, self.robot_to_brush[1] + self.brush_tag_offset_y, self.robot_to_brush[2]]
                 paint.orange = [paint.red[0], paint.red[1] + self.bw_brush_inc_y, paint.red[2]]
                 paint.yellow = [paint.orange[0], paint.orange[1] + self.bw_brush_inc_y, paint.orange[2]]
                 paint.green = [paint.yellow[0], paint.yellow[1] + self.bw_brush_inc_y, paint.yellow[2]]
