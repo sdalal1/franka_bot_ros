@@ -70,7 +70,8 @@ class ILikeToMoveItMoveIt(Node):
 
         # from IPython import embed; embed()
         # coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
-        coordinate_x, coordinate_y = np.loadtxt('fiona.csv', unpack= True, delimiter=',')
+        # coordinate_x, coordinate_y = np.loadtxt('fiona.csv', unpack= True, delimiter=',')
+        coordinate_x, coordinate_y = np.loadtxt('nader.csv', unpack= True, delimiter=',')
 
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
@@ -102,7 +103,7 @@ class ILikeToMoveItMoveIt(Node):
         # self.paint_location_standoff.position.y = 0.43162
         # self.paint_location_standoff.position.z = self.z_paint_standoff
         # self.paint_location_standoff.orientation = self.orientation
-        
+
         # # paint dip location
         # self.paint_location_dip = Pose()
         # self.paint_location_dip.position.x = 0.40275
@@ -119,8 +120,7 @@ class ILikeToMoveItMoveIt(Node):
         self.pickup_loc.position.z = self.z_brush_standoff
         self.pickup_loc.orientation = self.orientation
 
-
-        #brush pickup location
+        # brush pickup location
         self.pickup_dip = Pose()
         self.pickup_dip.position.x = self.pickup_loc.position.x
         self.pickup_dip.position.y = self.pickup_loc.position.y
@@ -136,8 +136,7 @@ class ILikeToMoveItMoveIt(Node):
         self.paintx = 0.0
         self.painty = 0.0
         self.paintz = 0.0
-        
-        
+
     def apriltagloc_cb(self, msg:Loc):
         # message type for the paint brush locations
         # self.get_logger().info(f'IN APRILTAGLOC_CB {msg}')
@@ -148,30 +147,56 @@ class ILikeToMoveItMoveIt(Node):
             self.brushlocs["orange"] = msg.orange
             self.brushlocs["yellow"] = msg.yellow
             self.brushlocs["palete"] = msg.palete
+            self.set_PaintLocs()
         except: 
             self.get_logger().info('Brush Locations Not Initlaized Yet')
-            
+
     def set_PaintLocs(self):
-        
-        # paint standoff location
+        # NOTE: x = -0.045 m
+        # NOTE: y = 0.015 m for red color
+
+        x_offset = -0.14  # m 
+        noise = np.random.normal(0, 0.01, 100)
+
         self.paint_location_standoff = Pose()
-        self.paint_location_standoff.position.x = self.brushlocs["palete"][0]
-        self.paint_location_standoff.position.y = self.brushlocs["palete"][1]
+        self.paint_location_dip = Pose()
+
         self.paint_location_standoff.position.z = self.z_paint_standoff
         self.paint_location_standoff.orientation = self.orientation
-        
-        # paint dip location
-        self.paint_location_dip = Pose()
-        self.paint_location_dip.position.x = self.brushlocs["palete"][0]
-        self.paint_location_dip.position.y = self.brushlocs["palete"][1]
-        # NOTE: we were subtracting 0.05 from the z value and keeping max_step = 0.1 and it was working but once we just decreased max_step, it also worked??
+
         self.paint_location_dip.position.z = self.z_paint_dip
         self.paint_location_dip.orientation = self.orientation
-        
+
+        self.paint_location_standoff.position.x = self.brushlocs["palete"][0] + x_offset + noise 
+        self.paint_location_dip.position.x = self.brushlocs["palete"][0] + x_offset + noise
+
+        if self.current_color == 'red':
+            y_offset = 0.04  # m
+            self.paint_location_standoff.position.y = self.brushlocs["palete"][1] + y_offset + noise
+            self.paint_location_dip.position.y = self.brushlocs["palete"][1] + y_offset + noise
+
+        # paint standoff location
+        # self.paint_location_standoff.position.x = self.brushlocs["palete"][0]
+        # self.paint_location_standoff.position.y = self.brushlocs["palete"][1]
+        # self.paint_location_standoff.position.z = self.z_paint_standoff
+        # self.paint_location_standoff.orientation = self.orientation
+
+        # paint dip location
+        # self.paint_location_dip.position.x = self.brushlocs["palete"][0]
+        # self.paint_location_dip.position.y = self.brushlocs["palete"][1]
+        # NOTE: we were subtracting 0.05 from the z value and keeping max_step = 0.1 and it was working but once we just decreased max_step, it also worked??
+        # self.paint_location_dip.position.z = self.z_paint_dip
+        # self.paint_location_dip.orientation = self.orientation
+
     def timer_callback(self):
         if self.state == State.START:
             self.get_logger().info("Making sure we start here all the time")
             start = input("Enter s to begin: " )
+            try: 
+                self.set_PaintLocs()
+            except:
+                pass
+
             if start == "s":
                 self.state = State.PICKUP
             else:
@@ -243,7 +268,7 @@ class ILikeToMoveItMoveIt(Node):
             # self.pickup = [0.44337, 0.244664, 0.25]
             try:
                 # standoff pose
-                self.pickup = [self.brushlocs[self.current_color][0], self.brushlocs[self.current_color][1], self.z_brush_standoff]
+                self.pickup = [self.brushlocs[self.current_color][0], self.brushlocs[self.current_color][1], self.z_brush_standoff - 0.1]
                 self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
                 self.state = State.UP
 
