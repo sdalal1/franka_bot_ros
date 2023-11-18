@@ -450,11 +450,12 @@ class Gripper:
     def create_close_grasp_msg(self):
         """Create a close grasp message."""
         grasp_msg = Grasp.Goal()
-        grasp_msg.width = 0.025  # with block
+        # grasp_msg.width = 0.025  # with block
+        grasp_msg.width = 0.00  # without the block
         grasp_msg.speed = 0.03
-        grasp_msg.force = 10.0
-        grasp_msg.epsilon.inner = 0.07
-        grasp_msg.epsilon.outer = 0.07
+        grasp_msg.force = 50.0
+        grasp_msg.epsilon.inner = 0.01
+        grasp_msg.epsilon.outer = 0.01
 
         future_gripper = self.gripper_client.send_goal_async(grasp_msg)
         future_gripper.add_done_callback(self.future_gripper_close_callback)
@@ -462,7 +463,7 @@ class Gripper:
     def create_open_grasp_msg(self):
         """Create an open grasp message."""
         grasp_msg = Grasp.Goal()
-        grasp_msg.width = 0.3
+        grasp_msg.width = 0.035
         grasp_msg.speed = 0.03
         grasp_msg.force = 10.0
         grasp_msg.epsilon.inner = 0.01

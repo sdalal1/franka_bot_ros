@@ -67,35 +67,35 @@ class ILikeToMoveItMoveIt(Node):
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
         self.apriltagsub = self.create_subscription(Loc,"paint_loc", self.apriltagloc_cb, 10)
-        
+
         # from IPython import embed; embed()
         # coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
         coordinate_x, coordinate_y = np.loadtxt('fiona.csv', unpack= True, delimiter=',')
 
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
-        
+
         coordinate_list = []
         self.brushlocs = {}
 
-        for x, y in zip(coordinate_x[:3], coordinate_y[:3]):
+        for x, y in zip(coordinate_x, coordinate_y):
             point = (x,y)
             coordinate_list.append(point)
 
         self.waypoints = coordinate_list
-        
+
         self.current_color = 'red'
         self.buffer = Buffer()
         self.listener = TransformListener(self.buffer, self)
-        
-        #varibles for z
+
+        # varibles for z
         self.z_brush_standoff = 0.25
         self.z_paint_standoff = 0.4
         self.z_brush_dot = 0.13
         self.z_paint_dip = 0.15
         self.z_brush_dip = 0.18
         self.z_dot_standoff = 0.25
-        
+
         # # paint standoff location
         # self.paint_location_standoff = Pose()
         # self.paint_location_standoff.position.x = 0.40275
