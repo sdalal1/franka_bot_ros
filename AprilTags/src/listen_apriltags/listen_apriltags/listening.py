@@ -40,7 +40,7 @@ class listener(Node):
         # self.base_to_tag = [0.5017, -0.2306, 0.0168]
         self.base_to_tag =[-0.4751, 0.21998, -0.1240]
 
-        self.brush_tag_offset_x = 0.12
+        self.brush_tag_offset_x = 0.1
         self.brush_tag_offset_y = 0.0
         self.bw_brush_inc_y = 0.0
 
