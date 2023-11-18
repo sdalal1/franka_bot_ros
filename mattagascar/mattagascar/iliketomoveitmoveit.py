@@ -71,7 +71,8 @@ class ILikeToMoveItMoveIt(Node):
         # from IPython import embed; embed()
         # coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('fiona.csv', unpack= True, delimiter=',')
-        coordinate_x, coordinate_y = np.loadtxt('nader.csv', unpack= True, delimiter=',')
+        # coordinate_x, coordinate_y = np.loadtxt('nader.csv', unpack= True, delimiter=',')
+        coordinate_x, coordinate_y = np.loadtxt('N_points.csv', unpack= True, delimiter=',')
 
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
@@ -92,9 +93,9 @@ class ILikeToMoveItMoveIt(Node):
         # varibles for z
         self.z_brush_standoff = 0.25
         self.z_paint_standoff = 0.4
-        self.z_brush_dot = 0.13
-        self.z_paint_dip = 0.15
-        self.z_brush_dip = 0.18
+        self.z_brush_dot = 0.125
+        self.z_paint_dip = 0.13
+        self.z_brush_dip = 0.17
         self.z_dot_standoff = 0.25
 
         # # paint standoff location
@@ -155,8 +156,9 @@ class ILikeToMoveItMoveIt(Node):
         # NOTE: x = -0.045 m
         # NOTE: y = 0.015 m for red color
 
-        x_offset = -0.14  # m 
-        noise = np.random.normal(0, 0.01, 100)
+        x_offset = -0.12  # m 
+        # noise = np.random.normal(0, 0.01, 1)[0]
+        noise = 0.0
 
         self.paint_location_standoff = Pose()
         self.paint_location_dip = Pose()
@@ -268,7 +270,7 @@ class ILikeToMoveItMoveIt(Node):
             # self.pickup = [0.44337, 0.244664, 0.25]
             try:
                 # standoff pose
-                self.pickup = [self.brushlocs[self.current_color][0], self.brushlocs[self.current_color][1], self.z_brush_standoff - 0.1]
+                self.pickup = [self.brushlocs[self.current_color][0], self.brushlocs[self.current_color][1], self.z_brush_standoff]
                 self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
                 self.state = State.UP
 
