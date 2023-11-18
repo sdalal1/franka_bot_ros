@@ -38,7 +38,7 @@ class listener(Node):
 
         self.camera_to_tag = None
         # self.base_to_tag = [0.5017, -0.2306, 0.0168]
-        self.base_to_tag =[-0.5098, 0.2242, -0.1240]
+        self.base_to_tag =[-0.4751, 0.21998, -0.1240]
 
         self.brush_tag_offset_x = 0.12
         self.brush_tag_offset_y = 0.0
