@@ -60,6 +60,7 @@ class ILikeToMoveItMoveIt(Node):
         self.grasping = Gripper(self)
 
         self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
+        self.orientation1 = Quaternion(x=0.92207, y=-0.38701, z=-0.0015236, w=-0.00015281)
 
         # self.state = State.PICKUP
         self.state = State.START
@@ -94,8 +95,8 @@ class ILikeToMoveItMoveIt(Node):
         self.z_brush_standoff = 0.25
         self.z_paint_standoff = 0.4
         self.z_brush_dot = 0.125
-        self.z_paint_dip = 0.13
-        self.z_brush_dip = 0.17
+        self.z_paint_dip = 0.14
+        self.z_brush_dip = 0.16
         self.z_dot_standoff = 0.25
 
         # # paint standoff location
@@ -301,13 +302,13 @@ class ILikeToMoveItMoveIt(Node):
                 standoff.position.x = self.waypoints[0][0]
                 standoff.position.y = self.waypoints[0][1]
                 standoff.position.z = self.z_dot_standoff
-                standoff.orientation = self.orientation
+                standoff.orientation = self.orientation1
 
                 dot_pos = Pose()
                 dot_pos.position.x = standoff.position.x
                 dot_pos.position.y = standoff.position.y
                 dot_pos.position.z = self.z_brush_dot
-                dot_pos.orientation = self.orientation
+                dot_pos.orientation = self.orientation1
 
                 msg_waypoints.append(standoff)
                 msg_waypoints.append(dot_pos)
@@ -351,13 +352,13 @@ class ILikeToMoveItMoveIt(Node):
                 self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
                 self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
                 self.pickup_loc.position.z = self.z_brush_standoff
-                self.pickup_loc.orientation = self.orientation
+                self.pickup_loc.orientation = self.orientation1
             
                 self.pickup_dip = Pose()
                 self.pickup_dip.position.x = self.pickup_loc.position.x
                 self.pickup_dip.position.y = self.pickup_loc.position.y
                 self.pickup_dip.position.z = self.z_brush_dip
-                self.pickup_dip.orientation = self.orientation
+                self.pickup_dip.orientation = self.orientation1
                 self.pick_msg_wpts = [self.pickup_loc, self.pickup_dip]
                 self.KingJulien.plan_path_cartesian(self.pick_msg_wpts)
                 self.state = State.PLANHOME
