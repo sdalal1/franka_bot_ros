@@ -60,9 +60,15 @@ class ILikeToMoveItMoveIt(Node):
         self.grasping = Gripper(self)
 
         self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
-        self.orientation1 = Quaternion(x=0.92207, y=-0.38701, z=-0.0015236, w=-0.00015281)
-
+        # self.orientation = Quaternion(x=1.0, y=0.0, z=0.0, w=0.0)
+        
+        # self.orientation1 = Quaternion(x=0.92207, y=-0.38701, z=0.0015236, w=0.0000015281)
+        # self.orientation1 = Quaternion(x=0.91771, y=-0.39138, z=0.061203, w=-0.029574)
+        # self.orientation = self.orientation1
+        # self.orientation = Quaternion(x=0.9318, y=-0.36271, z=0.01347, w=-0.0041108)
+        # self.orientation1 = Quaternion(x=0.93021, y=-0.36504, z=-0.022291, w=-0.030873)
         # self.state = State.PICKUP
+        self.orientation1=self.orientation
         self.state = State.START
         self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
@@ -271,8 +277,14 @@ class ILikeToMoveItMoveIt(Node):
             # self.pickup = [0.44337, 0.244664, 0.25]
             try:
                 # standoff pose
-                self.pickup = [self.brushlocs[self.current_color][0], self.brushlocs[self.current_color][1], self.z_brush_standoff]
-                self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
+                # self.pickup = [self.brushlocs[self.current_color][0], self.brushlocs[self.current_color][1], self.z_brush_standoff]
+                self.pickup_brush = Pose()
+                self.pickup_brush.position.x = self.brushlocs[self.current_color][0]
+                self.pickup_brush.position.y = self.brushlocs[self.current_color][1]
+                self.pickup_brush.position.z = self.z_brush_standoff
+                self.pickup_brush.orientation = self.orientation
+                self.KingJulien.plan_path_cartesian([self.pickup_brush])
+                # self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
                 self.state = State.UP
 
             except: 
