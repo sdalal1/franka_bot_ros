@@ -93,7 +93,7 @@ class Wrapper:
                                 "panda_joint6",
                                 "panda_joint7",
                                 ]
-            self.ee_joint_names = ['panda_link8', 'panda_rightfinger', 'panda_leftfinger']
+            self.ee_joint_names = ['panda_hand_tcp', 'panda_rightfinger', 'panda_leftfinger']
             self.joint_states = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             self.joint_sub = self.node.create_subscription(
                 JointState, "franka/joint_states", self.cb_joint_state, 10)
