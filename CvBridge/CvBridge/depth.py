@@ -123,11 +123,11 @@ class ImageListener(Node):
     
     def colordetenction(self,masked):
         hsv=cv2.cvtColor(masked, cv2.COLOR_BGR2HSV)
-        lower_blue = np.array([cv2.getTrackbarPos('LowH_blue','trackbar'),cv2.getTrackbarPos('LowS_blue','trackbar'),cv2.getTrackbarPos('LowV_blue','trackbar')])
-        upper_blue = np.array([cv2.getTrackbarPos('HighH_blue','trackbar'),cv2.getTrackbarPos('HighS_blue','trackbar'),cv2.getTrackbarPos('HighV_blue','trackbar')])
+        # lower_blue = np.array([cv2.getTrackbarPos('LowH_blue','trackbar'),cv2.getTrackbarPos('LowS_blue','trackbar'),cv2.getTrackbarPos('LowV_blue','trackbar')])
+        # upper_blue = np.array([cv2.getTrackbarPos('HighH_blue','trackbar'),cv2.getTrackbarPos('HighS_blue','trackbar'),cv2.getTrackbarPos('HighV_blue','trackbar')])
 
-        # lower_blue = np.array([94, 80, 2], np.uint8) 
-        # upper_blue = np.array([120, 255, 255], np.uint8) 
+        lower_blue = np.array([114, 20, 86], np.uint8) 
+        upper_blue = np.array([149, 149, 165], np.uint8) 
         blue_mask= cv2.inRange(hsv, lower_blue, upper_blue)
         
         lower_red = np.array([cv2.getTrackbarPos('LowH_red','trackbar'),cv2.getTrackbarPos('LowS_red','trackbar'),cv2.getTrackbarPos('LowV_red','trackbar')])
@@ -213,8 +213,8 @@ class ImageListener(Node):
         conto=cv2.drawContours(masked, contours, -1, (0,255,0), 3)
         
         
-        cv2.imshow('Thresh',conto)
-        cv2.setMouseCallback('Thresh', self.click_event) 
+        # cv2.imshow('Thresh',conto)
+        # cv2.setMouseCallback('Thresh', self.click_event) 
         
         # cv2.namedWindow('BLUE', cv2.WINDOW_NORMAL)
         # cv2.imshow('BLUE',img_close_blue)
@@ -225,7 +225,7 @@ class ImageListener(Node):
         # cv2.namedWindow('green', cv2.WINDOW_NORMAL)
         # cv2.imshow('green',img_close_green)
  
-        cv2.waitKey(1)
+        # cv2.waitKey(1)
         # self.get_logger().info(f"finish? {cx_blue, cx_green, cx_red}")
         
     def broadcaster(self,tagpos):
