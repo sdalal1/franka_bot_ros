@@ -88,9 +88,9 @@ class PopulateMsgs():
         cart_pos_rqst.waypoints = waypoints  # this must be a list of Pose() msgs
         max_step = 0.05
         # not setting these will cause the motion to be fastttttt!
-        cart_pos_rqst.max_velocity_scaling_factor = 0.1
-        cart_pos_rqst.max_acceleration_scaling_factor = 0.1
-        cart_pos_rqst.max_cartesian_speed = 0.10
+        cart_pos_rqst.max_velocity_scaling_factor = 0.05
+        cart_pos_rqst.max_acceleration_scaling_factor = 0.05
+        cart_pos_rqst.max_cartesian_speed = 0.05
         # cart_pos_rqst.cartesian_speed_limited_link = 'panda_hand_tcp'
         cart_pos_rqst.cartesian_speed_limited_link = 'panda_link8'
         cart_pos_rqst.max_step = max_step
@@ -253,9 +253,9 @@ class PopulateMsgs():
         motion_plan_rq.pipeline_id = "move_group"
         motion_plan_rq.group_name = self.group_name
         motion_plan_rq.num_planning_attempts = 10
-        motion_plan_rq.allowed_planning_time = 5.0
+        motion_plan_rq.allowed_planning_time = 7.0
         motion_plan_rq.max_velocity_scaling_factor = 0.1
-        motion_plan_rq.max_acceleration_scaling_factor = 0.1
+        motion_plan_rq.max_acceleration_scaling_factor = 0.05
         motion_plan_rq.max_cartesian_speed = 0.0
         return motion_plan_rq
 

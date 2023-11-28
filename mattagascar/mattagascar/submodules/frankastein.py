@@ -450,9 +450,9 @@ class Gripper:
     def create_close_grasp_msg(self):
         """Create a close grasp message."""
         grasp_msg = Grasp.Goal()
-        grasp_msg.width = 0.030  # with block
+        grasp_msg.width = 0.00  # with block
         # grasp_msg.width = 0.00  # without the block
-        grasp_msg.speed = 0.03
+        grasp_msg.speed = 0.1
         grasp_msg.force = 50.0
         grasp_msg.epsilon.inner = 0.01
         grasp_msg.epsilon.outer = 0.01
