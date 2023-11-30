@@ -24,4 +24,6 @@
     <!-- rviz -->
     <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share listen_apriltags)/$(var rviz_config)"/>
 
+    <!-- <node pkg="CvBridge" exec="depth" name="depth"/> -->
+
 </launch>

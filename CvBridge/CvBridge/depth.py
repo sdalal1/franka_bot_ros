@@ -28,27 +28,28 @@ class ImageListener(Node):
         self.listener = TransformListener(self.buffer, self)
         self.camera_info = self.create_subscription(CameraInfo,'/camera/color/camera_info',self.camera_info_cb,10)
         self.tf_broadcaster = TransformBroadcaster(self)
-        self.cx_blue=None
-        self.cy_blue=None
-        self.cx_red=None
-        self.cy_red=None
+        self.cx_purple=None
+        self.cy_purple=None
+        self.cx_yellow=None
+        self.cy_yellow=None
         self.cx_green=None
         self.cy_green=None
         
         self.intrinsics = None
         cv2.namedWindow('trackbar',cv2.WINDOW_NORMAL)
-        cv2.createTrackbar('LowH_blue','trackbar',0,179,self.nothing)
-        cv2.createTrackbar('HighH_blue','trackbar',0,179,self.nothing)
-        cv2.createTrackbar('LowS_blue','trackbar',0,255,self.nothing)
-        cv2.createTrackbar('HighS_blue','trackbar',0,255,self.nothing)
-        cv2.createTrackbar('LowV_blue','trackbar',0,255,self.nothing)
-        cv2.createTrackbar('HighV_blue','trackbar',0,255,self.nothing)
-        cv2.createTrackbar('LowH_red','trackbar',0,179,self.nothing)
-        cv2.createTrackbar('HighH_red','trackbar',0,179,self.nothing)
-        cv2.createTrackbar('LowS_red','trackbar',0,255,self.nothing)
-        cv2.createTrackbar('HighS_red','trackbar',0,255,self.nothing)
-        cv2.createTrackbar('LowV_red','trackbar',0,255,self.nothing)
-        cv2.createTrackbar('HighV_red','trackbar',0,255,self.nothing)
+        # cv2.createTrackbar('LowH_purple','trackbar',0,179,self.nothing)
+        # cv2.createTrackbar('HighH_purple','trackbar',0,179,self.nothing)
+        # cv2.createTrackbar('LowS_purple','trackbar',0,255,self.nothing)
+        # cv2.createTrackbar('HighS_purple','trackbar',0,255,self.nothing)
+        # cv2.createTrackbar('LowV_purple','trackbar',0,255,self.nothing)
+        # cv2.createTrackbar('HighV_purple','trackbar',0,255,self.nothing)
+
+        cv2.createTrackbar('LowH_yellow','trackbar',0,179,self.nothing)
+        cv2.createTrackbar('HighH_yellow','trackbar',0,179,self.nothing)
+        cv2.createTrackbar('LowS_yellow','trackbar',0,255,self.nothing)
+        cv2.createTrackbar('HighS_yellow','trackbar',0,255,self.nothing)
+        cv2.createTrackbar('LowV_yellow','trackbar',0,255,self.nothing)
+        cv2.createTrackbar('HighV_yellow','trackbar',0,255,self.nothing)
 
         cv2.createTrackbar('LowH_green','trackbar',0,179,self.nothing)
         cv2.createTrackbar('HighH_green','trackbar',0,179,self.nothing)
@@ -123,19 +124,22 @@ class ImageListener(Node):
     
     def colordetenction(self,masked):
         hsv=cv2.cvtColor(masked, cv2.COLOR_BGR2HSV)
-        # lower_blue = np.array([cv2.getTrackbarPos('LowH_blue','trackbar'),cv2.getTrackbarPos('LowS_blue','trackbar'),cv2.getTrackbarPos('LowV_blue','trackbar')])
-        # upper_blue = np.array([cv2.getTrackbarPos('HighH_blue','trackbar'),cv2.getTrackbarPos('HighS_blue','trackbar'),cv2.getTrackbarPos('HighV_blue','trackbar')])
+        # lower_purple = np.array([cv2.getTrackbarPos('LowH_purple','trackbar'),cv2.getTrackbarPos('LowS_purple','trackbar'),cv2.getTrackbarPos('LowV_purple','trackbar')])
+        # upper_purple = np.array([cv2.getTrackbarPos('HighH_purple','trackbar'),cv2.getTrackbarPos('HighS_purple','trackbar'),cv2.getTrackbarPos('HighV_purple','trackbar')])
 
-        lower_blue = np.array([114, 20, 86], np.uint8) 
-        upper_blue = np.array([149, 149, 165], np.uint8) 
-        blue_mask= cv2.inRange(hsv, lower_blue, upper_blue)
+        lower_purple = np.array([114, 20, 86], np.uint8) 
+        upper_purple = np.array([149, 149, 165], np.uint8) 
+        purple_mask= cv2.inRange(hsv, lower_purple, upper_purple)
         
-        lower_red = np.array([cv2.getTrackbarPos('LowH_red','trackbar'),cv2.getTrackbarPos('LowS_red','trackbar'),cv2.getTrackbarPos('LowV_red','trackbar')])
-        upper_red = np.array([cv2.getTrackbarPos('HighH_red','trackbar'),cv2.getTrackbarPos('HighS_red','trackbar'),cv2.getTrackbarPos('HighV_red','trackbar')])
+        # lower_yellow = np.array([cv2.getTrackbarPos('LowH_yellow','trackbar'),cv2.getTrackbarPos('LowS_yellow','trackbar'),cv2.getTrackbarPos('LowV_yellow','trackbar')])
+        # upper_yellow = np.array([cv2.getTrackbarPos('HighH_yellow','trackbar'),cv2.getTrackbarPos('HighS_yellow','trackbar'),cv2.getTrackbarPos('HighV_yellow','trackbar')])
 
-        # lower_red = np.array([136, 87, 111], np.uint8)
-        # upper_red = np.array([180, 255, 255], np.uint8) 
-        red_mask= cv2.inRange(hsv, lower_red, upper_red)
+        lower_yellow = np.array([6, 118, 195], np.uint8) 
+        upper_yellow = np.array([42, 170, 224], np.uint8) 
+
+        # lower_yellow = np.array([136, 87, 111], np.uint8)
+        # upper_yellow = np.array([180, 255, 255], np.uint8) 
+        yellow_mask= cv2.inRange(hsv, lower_yellow, upper_yellow)
         
         lower_green = np.array([cv2.getTrackbarPos('LowH_green','trackbar'),cv2.getTrackbarPos('LowS_green','trackbar'),cv2.getTrackbarPos('LowV_green','trackbar')])
         upper_green = np.array([cv2.getTrackbarPos('HighH_green','trackbar'),cv2.getTrackbarPos('HighS_green','trackbar'),cv2.getTrackbarPos('HighV_green','trackbar')])
@@ -148,18 +152,18 @@ class ImageListener(Node):
         kernelo=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,kernel_size)
         kernel_sizec=(20,20)
         kernelc=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,kernel_sizec)
-        img_open=cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernelo)
-        img_open1=cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernelo)
+        img_open=cv2.morphologyEx(purple_mask, cv2.MORPH_OPEN, kernelo)
+        img_open1=cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernelo)
         img_open2=cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernelo)
-        img_close_blue=cv2.morphologyEx(img_open, cv2.MORPH_CLOSE, kernelc)
-        img_close_red=cv2.morphologyEx(img_open1, cv2.MORPH_CLOSE, kernelc)
+        img_close_purple=cv2.morphologyEx(img_open, cv2.MORPH_CLOSE, kernelc)
+        img_close_yellow=cv2.morphologyEx(img_open1, cv2.MORPH_CLOSE, kernelc)
         img_close_green=cv2.morphologyEx(img_open2, cv2.MORPH_CLOSE, kernelc)
 
         
-        res_blue= cv2.bitwise_and(masked, masked, mask=img_close_blue)
-        res_red= cv2.bitwise_and(masked, masked, mask=img_close_red)
+        res_purple= cv2.bitwise_and(masked, masked, mask=img_close_purple)
+        res_yellow= cv2.bitwise_and(masked, masked, mask=img_close_yellow)
         res_green= cv2.bitwise_and(masked, masked, mask=img_close_green)
-        contours, hierarchy=cv2.findContours(img_close_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy=cv2.findContours(img_close_purple, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         #print(len(contours))
 
         biggest_contour=0
@@ -170,13 +174,13 @@ class ImageListener(Node):
                     biggest_contour=contours[a]
         
             M=cv2.moments(biggest_contour)
-            self.cx_blue= int(M['m10']/M['m00'])
-            self.cy_blue= int(M['m01']/M['m00'])
+            self.cx_purple= int(M['m10']/M['m00'])
+            self.cy_purple= int(M['m01']/M['m00'])
 
-            cv2.circle(masked, (self.cx_blue, self.cy_blue), 3, (255,255,255), -1)
-            cv2.putText(masked, 'blue_centroid', (self.cx_blue-10,self.cy_blue-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2, cv2.LINE_AA)
+            cv2.circle(masked, (self.cx_purple, self.cy_purple), 3, (255,255,255), -1)
+            cv2.putText(masked, 'purple_centroid', (self.cx_purple-10,self.cy_purple-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2, cv2.LINE_AA)
         
-        contours, hierarchy=cv2.findContours(img_close_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy=cv2.findContours(img_close_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         #print(len(contours))
         
         biggest_contour=0
@@ -187,11 +191,11 @@ class ImageListener(Node):
                     biggest_contour=contours[a]
         
             M=cv2.moments(biggest_contour)
-            self.cx_red= int(M['m10']/M['m00'])
-            self.cy_red= int(M['m01']/M['m00'])
+            self.cx_yellow= int(M['m10']/M['m00'])
+            self.cy_yellow= int(M['m01']/M['m00'])
 
-            cv2.circle(masked, (self.cx_red, self.cy_red), 3, (255,255,255), -1)
-            cv2.putText(masked, 'red_centroid', (self.cx_red-10,self.cy_red-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2, cv2.LINE_AA)
+            cv2.circle(masked, (self.cx_yellow, self.cy_yellow), 3, (255,255,255), -1)
+            cv2.putText(masked, 'yellow_centroid', (self.cx_yellow-10,self.cy_yellow-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2, cv2.LINE_AA)
             
         contours, hierarchy=cv2.findContours(img_close_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         #print(len(contours))
@@ -216,53 +220,53 @@ class ImageListener(Node):
         # cv2.imshow('Thresh',conto)
         # cv2.setMouseCallback('Thresh', self.click_event) 
         
-        # cv2.namedWindow('BLUE', cv2.WINDOW_NORMAL)
-        # cv2.imshow('BLUE',img_close_blue)
+        # cv2.namedWindow('purple', cv2.WINDOW_NORMAL)
+        # cv2.imshow('purple',img_close_purple)
 
-        # cv2.namedWindow('red', cv2.WINDOW_NORMAL)
-        # cv2.imshow('red',img_close_red)
+        # cv2.namedWindow('yellow', cv2.WINDOW_NORMAL)
+        # cv2.imshow('yellow',img_close_yellow)
 
         # cv2.namedWindow('green', cv2.WINDOW_NORMAL)
         # cv2.imshow('green',img_close_green)
  
         # cv2.waitKey(1)
-        # self.get_logger().info(f"finish? {cx_blue, cx_green, cx_red}")
+        # self.get_logger().info(f"finish? {cx_purple, cx_green, cx_yellow}")
         
     def broadcaster(self,tagpos):
         depth = tagpos[2]
-        if self.cx_red is not None and self.cy_red is not None:
-            red_pos = rs2.rs2_deproject_pixel_to_point(self.intrinsics,[self.cx_red,self.cy_red],depth)
+        if self.cx_yellow is not None and self.cy_yellow is not None:
+            yellow_pos = rs2.rs2_deproject_pixel_to_point(self.intrinsics,[self.cx_yellow,self.cy_yellow],depth)
             r = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             r.header.stamp = self.get_clock().now().to_msg()
             r.header.frame_id = 'camera_color_optical_frame'
-            r.child_frame_id = 'red_color'
+            r.child_frame_id = 'yellow_color'
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
-            r.transform.translation.x = red_pos[0]
-            r.transform.translation.y = red_pos[1]
-            r.transform.translation.z = red_pos[2]
+            r.transform.translation.x = yellow_pos[0]
+            r.transform.translation.y = yellow_pos[1]
+            r.transform.translation.z = yellow_pos[2]
             
             self.tf_broadcaster.sendTransform(r)
             
-        if self.cx_blue is not None and self.cy_blue is not None:
-            blue_pos = rs2.rs2_deproject_pixel_to_point(self.intrinsics,[self.cx_blue,self.cy_blue],depth)
+        if self.cx_purple is not None and self.cy_purple is not None:
+            purple_pos = rs2.rs2_deproject_pixel_to_point(self.intrinsics,[self.cx_purple,self.cy_purple],depth)
             b = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             b.header.stamp = self.get_clock().now().to_msg()
             b.header.frame_id = 'camera_color_optical_frame'
-            b.child_frame_id = 'blue_color'
+            b.child_frame_id = 'purple_color'
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
-            b.transform.translation.x = blue_pos[0]
-            b.transform.translation.y = blue_pos[1]
-            b.transform.translation.z = blue_pos[2]
+            b.transform.translation.x = purple_pos[0]
+            b.transform.translation.y = purple_pos[1]
+            b.transform.translation.z = purple_pos[2]
             
             self.tf_broadcaster.sendTransform(b)
             
@@ -293,6 +297,7 @@ class ImageListener(Node):
         
         
         if self.last_image is not None and tagloc is not None:
+            self.get_logger().info("Video Received" ,once=True)
             masked = self.masking(self.last_image,tagloc)
             self.colordetenction(masked)
             self.broadcaster(tagloc)
