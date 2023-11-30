@@ -45,6 +45,7 @@ class State(Enum):
     PLANHOME = auto()
     EXECUTING2 = auto()
 
+
 class ILikeToMoveItMoveIt(Node):
     """
     Test Node. Commented code includes functions that work with interbotix.
@@ -59,27 +60,30 @@ class ILikeToMoveItMoveIt(Node):
         self.Mort = FRANKA
         self.grasping = Gripper(self)
 
-        self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
+        self.orientation = Quaternion(
+            x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
         # self.orientation = Quaternion(x=1.0, y=0.0, z=0.0, w=0.0)
-        
+
         # self.orientation1 = Quaternion(x=0.92207, y=-0.38701, z=0.0015236, w=0.0000015281)
         # self.orientation1 = Quaternion(x=0.91771, y=-0.39138, z=0.061203, w=-0.029574)
         # self.orientation = self.orientation1
         # self.orientation = Quaternion(x=0.9318, y=-0.36271, z=0.01347, w=-0.0041108)
         # self.orientation1 = Quaternion(x=0.93021, y=-0.36504, z=-0.022291, w=-0.030873)
         # self.state = State.PICKUP
-        self.orientation1=self.orientation
+        self.orientation1 = self.orientation
         self.state = State.START
         # self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
-        self.apriltagsub = self.create_subscription(Loc,"paint_loc", self.apriltagloc_cb, 10)
+        self.apriltagsub = self.create_subscription(
+            Loc, "paint_loc", self.apriltagloc_cb, 10)
 
         # from IPython import embed; embed()
         # coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('fiona.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('nader.csv', unpack= True, delimiter=',')
-        coordinate_x, coordinate_y = np.loadtxt('N_points.csv', unpack= True, delimiter='\t')
+        coordinate_x, coordinate_y = np.loadtxt(
+            'N_points.csv', unpack=True, delimiter='\t')
 
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
@@ -88,7 +92,7 @@ class ILikeToMoveItMoveIt(Node):
         self.brushlocs = {}
 
         for x, y in zip(coordinate_x, coordinate_y):
-            point = (x,y)
+            point = (x, y)
             coordinate_list.append(point)
 
         self.waypoints = coordinate_list
@@ -103,7 +107,7 @@ class ILikeToMoveItMoveIt(Node):
         self.z_brush_dot = 0.125 + .045
         self.z_paint_dip = 0.14 + .055
         self.z_brush_dip = 0.16 + self.zoffset
-        self.z_dot_standoff = 0.25 + self.zoffset
+        self.z_dot_standoff = 0.25
 
         # # paint standoff location
         # self.paint_location_standoff = Pose()
@@ -145,10 +149,10 @@ class ILikeToMoveItMoveIt(Node):
         self.painty = 0.0
         self.paintz = 0.0
 
-    def apriltagloc_cb(self, msg:Loc):
+    def apriltagloc_cb(self, msg: Loc):
         # message type for the paint brush locations
         # self.get_logger().info(f'IN APRILTAGLOC_CB {msg}')
-        try:            
+        try:
             self.brushlocs["red"] = msg.red
             self.brushlocs["blue"] = msg.blue
             self.brushlocs["green"] = msg.green
@@ -156,14 +160,15 @@ class ILikeToMoveItMoveIt(Node):
             self.brushlocs["yellow"] = msg.yellow
             self.brushlocs["palete"] = msg.palete
             self.set_PaintLocs()
-        except: 
+        except:
             self.get_logger().info('Brush Locations Not Initlaized Yet')
 
     def set_PaintLocs(self):
         try:
             # get the latest transform between left and right
             # (rclpy.time.Time() means get the latest information)
-            trans = self.buffer.lookup_transform("panda_link0", "blue_color", rclpy.time.Time())
+            trans = self.buffer.lookup_transform(
+                "panda_link0", "blue_color", rclpy.time.Time())
             self.purple_x = trans.transform.translation.x
             self.purple_y = trans.transform.translation.y
             self.purple_z = trans.transform.translation.z
@@ -175,7 +180,7 @@ class ILikeToMoveItMoveIt(Node):
         # NOTE: x = -0.045 m
         # NOTE: y = 0.015 m for red color
 
-        x_offset = -0.12  # m 
+        x_offset = -0.12  # m
         # noise = np.random.normal(0, 0.01, 1)[0]
         noise = 0.0
 
@@ -188,9 +193,9 @@ class ILikeToMoveItMoveIt(Node):
         self.paint_location_dip.position.z = self.z_paint_dip
         self.paint_location_dip.orientation = self.orientation
 
-        # self.paint_location_standoff.position.x = self.brushlocs["palete"][0] + x_offset + noise 
+        # self.paint_location_standoff.position.x = self.brushlocs["palete"][0] + x_offset + noise
         # self.paint_location_dip.position.x = self.brushlocs["palete"][0] + x_offset + noise
-        self.paint_location_standoff.position.x = self.purple_x 
+        self.paint_location_standoff.position.x = self.purple_x
         self.paint_location_dip.position.x = self.purple_x
         self.paint_location_standoff.position.y = self.purple_y
         self.paint_location_dip.position.y = self.purple_y
@@ -215,8 +220,8 @@ class ILikeToMoveItMoveIt(Node):
     def timer_callback(self):
         if self.state == State.START:
             self.get_logger().info("Making sure we start here all the time")
-            start = input("Enter s to begin: " )
-            try: 
+            start = input("Enter s to begin: ")
+            try:
                 self.set_PaintLocs()
             except:
                 pass
@@ -228,13 +233,15 @@ class ILikeToMoveItMoveIt(Node):
 
         if self.state == State.TEST:
             try:
-            # get the latest transform between left and right
-            # (rclpy.time.Time() means get the latest information)
-                trans = self.buffer.lookup_transform("panda_link0", "brush", rclpy.time.Time())
+                # get the latest transform between left and right
+                # (rclpy.time.Time() means get the latest information)
+                trans = self.buffer.lookup_transform(
+                    "panda_link0", "brush", rclpy.time.Time())
                 self.paintx = trans.transform.translation.x
                 self.painty = trans.transform.translation.y
                 self.paintz = trans.transform.translation.z
-                self.get_logger().info(f"Tag Location: {self.paintx,self.painty,self.paintz}")
+                self.get_logger().info(
+                    f"Tag Location: {self.paintx,self.painty,self.paintz}")
 
             except tf2_ros.LookupException as e:
                 # the frames don't exist yet
@@ -243,7 +250,7 @@ class ILikeToMoveItMoveIt(Node):
         if self.state == State.PICKUP:
             # go to paint brush location and dip down
 
-            # # this is the position of the paint pallete 
+            # # this is the position of the paint pallete
             try:
                 # standoff pose
                 print("in the 1st try")
@@ -253,7 +260,7 @@ class ILikeToMoveItMoveIt(Node):
                 self.pickup_loc.position.z = self.z_brush_standoff
                 self.pickup_loc.orientation = self.orientation
                 # self.get_logger().info(f'BRUSH LOCATION: {self.pickup_loc.position.x, self.pickup_loc.position.y}')
-            
+
                 self.pickup_dip = Pose()
                 self.pickup_dip.position.x = self.pickup_loc.position.x
                 self.pickup_dip.position.y = self.pickup_loc.position.y
@@ -261,13 +268,12 @@ class ILikeToMoveItMoveIt(Node):
                 self.pickup_dip.orientation = self.orientation
                 self.pick_msg_wpts = [self.pickup_loc, self.pickup_dip]
                 self.KingJulien.plan_path_cartesian(self.pick_msg_wpts)
-                
+
                 self.state = State.PLANNING_GRIPPER
                 # self.state = State.DONE
 
-            except: 
+            except:
                 self.get_logger().info('Brush Locations in timer Not Initlaized Yet')
-
 
         elif self.state == State.PLANNING_GRIPPER:
             self.get_logger().info('IN PLANNING GRIPPER', once=True)
@@ -303,7 +309,7 @@ class ILikeToMoveItMoveIt(Node):
                 # self.KingJulien.plan_path_to_position_orientation(self.pickup, self.orientation)
                 self.state = State.UP
 
-            except: 
+            except:
                 self.get_logger().info('Brush Locations in timer 2 Not Initlaized Yet')
 
         elif self.state == State.UP:
@@ -317,34 +323,34 @@ class ILikeToMoveItMoveIt(Node):
             self.get_logger().info('IN INITIALIZE', once=True)
 
             msg_waypoints = []
-            
+
             if not self.waypoints:
                 # return to paintbrush location to drop off at home
                 print("self.waypoints is Empty")
-                self.home = input("Return paintbrush back? (y/n): " )
+                self.home = input("Return paintbrush back? (y/n): ")
                 self.state = State.DONE
 
-            else: 
+            else:
 
                 standoff = Pose()
-                
+
                 standoff.position.x = self.waypoints[0][0]
                 standoff.position.y = self.waypoints[0][1]
                 standoff.position.z = self.z_dot_standoff
                 standoff.orientation = self.orientation1
-                
+
                 dot_pos = Pose()
                 dot_pos.position.x = standoff.position.x
                 dot_pos.position.y = standoff.position.y
                 dot_pos.position.z = self.z_brush_dot
                 dot_pos.orientation = self.orientation1
-                for _ in range(100): 
+                for _ in range(100):
                     msg_waypoints.append(standoff)
                 for _ in range(100):
                     msg_waypoints.append(dot_pos)
                 for _ in range(100):
                     msg_waypoints.append(standoff)
-                
+
                 self.state = State.EXECUTING
 
                 self.visited.append(self.waypoints[0])
@@ -354,10 +360,9 @@ class ILikeToMoveItMoveIt(Node):
                 if self.count % 5 == 0:
                     # NOTE: needs paint
                     # NOTE: simulating for now until using cv (cv will tells us when to refill)
-                    
+
                     # Updating pallete location from the dictionary to the message we are sending.
-                    
-                    
+
                     self.set_PaintLocs()
                     msg_waypoints.append(self.paint_location_standoff)
                     msg_waypoints.append(self.paint_location_dip)
@@ -387,7 +392,7 @@ class ILikeToMoveItMoveIt(Node):
                 self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
                 self.pickup_loc.position.z = self.z_brush_standoff
                 self.pickup_loc.orientation = self.orientation1
-            
+
                 self.pickup_dip = Pose()
                 self.pickup_dip.position.x = self.pickup_loc.position.x
                 self.pickup_dip.position.y = self.pickup_loc.position.y
