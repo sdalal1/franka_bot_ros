@@ -62,53 +62,55 @@ class Wrapper:
 
         self.scene_planner = self.node.create_client(
             GetPlanningScene, "get_planning_scene"
-            )
+        )
         while not self.scene_planner.wait_for_service(timeout_sec=2.0):
             self.node.get_logger().info(
                 'get planning scence service not available, waiting again...')
 
         self.apply_planning_scene = self.node.create_client(
             ApplyPlanningScene, "apply_planning_scene"
-            )
+        )
         while not self.apply_planning_scene.wait_for_service(timeout_sec=2.0):
             self.node.get_logger().info(
                 'apply planning scence service not available, waiting again...'
-                )
-            
-        self.cartesian_srv_client = self.node.create_client(GetCartesianPath, "compute_cartesian_path")
+            )
+
+        self.cartesian_srv_client = self.node.create_client(
+            GetCartesianPath, "compute_cartesian_path")
 
         # Robot Type -- choice between franka and interbotix
         self.robot_type = robot_type
         if self.robot_type == "panda_manipulator":
             self.pop_msgs = PopulateMsgs(
-                            node=self.node, group_name="panda_manipulator")
+                node=self.node, group_name="panda_manipulator")
             self.action_node = ActionClient(
-                            self.node, MoveGroup, "move_action")
+                self.node, MoveGroup, "move_action")
             self.joint_names = [
-                                "panda_joint1",
-                                "panda_joint2",
-                                "panda_joint3",
-                                "panda_joint4",
-                                "panda_joint5",
-                                "panda_joint6",
-                                "panda_joint7",
-                                ]
-            self.ee_joint_names = ['panda_hand_tcp', 'panda_rightfinger', 'panda_leftfinger']
+                "panda_joint1",
+                "panda_joint2",
+                "panda_joint3",
+                "panda_joint4",
+                "panda_joint5",
+                "panda_joint6",
+                "panda_joint7",
+            ]
+            self.ee_joint_names = ['panda_hand_tcp',
+                                   'panda_rightfinger', 'panda_leftfinger']
             self.joint_states = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             self.joint_sub = self.node.create_subscription(
                 JointState, "franka/joint_states", self.cb_joint_state, 10)
 
         elif self.robot_type == "interbotix":
             self.pop_msgs = PopulateMsgs(
-                            node=self.node, group_name="interbotix_arm")
+                node=self.node, group_name="interbotix_arm")
 
             self.action_node = ActionClient(
-                            self.node, MoveGroup, "move_action")
+                self.node, MoveGroup, "move_action")
 
             self.joint_names = ["shoulder", "elbow", "wrist_angle", "waist"]
             self.joint_states = [0.0, 0.0, 0.0, 0.0]
             self.joint_sub = self.node.create_subscription(
-                    JointState, "px100/joint_states", self.cb_joint_state, 10)
+                JointState, "px100/joint_states", self.cb_joint_state, 10)
 
         self.ik_client = self.node.create_client(GetPositionIK, "compute_ik")
 
@@ -120,7 +122,8 @@ class Wrapper:
 
         self.state = FRANKA.INITALIZE
 
-        self.execute_action = ActionClient(self.node, ExecuteTrajectory, "execute_trajectory")
+        self.execute_action = ActionClient(
+            self.node, ExecuteTrajectory, "execute_trajectory")
 
     def cb_joint_state(self, msg: JointState):
         """
@@ -147,7 +150,7 @@ class Wrapper:
             self.joint_names, joint_angles)
 
         motion_plan = self.pop_msgs.set_MotionPlanMsgs(
-                    self.frame_id, self.joint_names, new_joint_states.position)
+            self.frame_id, self.joint_names, new_joint_states.position)
 
         motion_plan.request.goal_constraints = goal_constraints
         future_po = self.action_node.send_goal_async(motion_plan)
@@ -165,7 +168,7 @@ class Wrapper:
             self.joint_names, joint_angles)
 
         motion_plan = self.pop_msgs.set_MotionPlanMsgs(
-                    self.frame_id, self.joint_names, new_joint_states.position)
+            self.frame_id, self.joint_names, new_joint_states.position)
 
         motion_plan.request.goal_constraints = goal_constraints
         future = self.action_node.send_goal_async(motion_plan)
@@ -194,7 +197,6 @@ class Wrapper:
             self.node.get_logger().info('Path not found in Frankastein')
             self.state = FRANKA.WAITING
 
-
     def goal_path_cb(self, future):
         """
         Call back function for the goal position path.
@@ -210,7 +212,7 @@ class Wrapper:
         result = future.result()
         _position_result_future = result.get_result_async()
         _position_result_future.add_done_callback(
-                                    self.get_result_cb)
+            self.get_result_cb)
 
     def get_result_cb(self, motion_plan_future):
         """
@@ -254,7 +256,6 @@ class Wrapper:
         self.state = FRANKA.DONE
     # compute_cartesian_path(waypoints, eef_step = 0.01, jump_threshold = 0.0)
 
-
     def plan_path_cartesian(self, waypoints):
         """
         Cartesian path directly by specifying a list of waypoints for the end-effector to go through.
@@ -262,25 +263,25 @@ class Wrapper:
         # z = 0.21811
 
         frame_id = 'panda_link0'
-        # link_name = 
+        # link_name =
         # max_step =s
         # jump_theshold = '
-        # position = 
+        # position =
         # jump_theshold =
         # dT = self.node.get_clock().now().to_msg()
         # start_state =  [0.40401, 0.25614, 0.57185]
         start_state = [0.30724, 0.00054, 0.59104]
         # dT = [1.0, 2.0, 3.0]
-        cartesian_msgs_request = self.pop_msgs.set_GetCartesianPositionRqt(self.robot_type, frame_id, start_state, self.ee_joint_names, waypoints)
+        cartesian_msgs_request = self.pop_msgs.set_GetCartesianPositionRqt(
+            self.robot_type, frame_id, start_state, self.ee_joint_names, waypoints)
         # print("cartesian msg", cartesian_msgs_request)
         # THIS IS INCORRECT BECAUSE NEED TO PASS IN THE MESSAGES IN THE POP MES
-        self.cartesian_future = self.cartesian_srv_client.call_async(cartesian_msgs_request)
+        self.cartesian_future = self.cartesian_srv_client.call_async(
+            cartesian_msgs_request)
 
         self.cartesian_future.add_done_callback(self.future_cartesian_cb)
 
         # future_cart.add_done_callback(self.goal_path_cb)
-
-            
 
     def plan_path_to_position(self, positions):
         """
@@ -304,18 +305,20 @@ class Wrapper:
         pose_stamped = self.pop_msgs.set_PoseStamp_position(point)
 
         robot_state = self.pop_msgs.set_RobotState(
-                                            frame_id=self.frame_id,
-                                            joint_names=self.joint_names,
-                                            position=self.joint_states)
+            frame_id=self.frame_id,
+            joint_names=self.joint_names,
+            position=self.joint_states)
         avoid_collisions = True
         timeout = self.pop_msgs.set_Duration(time=5)
 
         IK_request = self.pop_msgs.set_IKRequest(
             robot_state, avoid_collisions, pose_stamped, timeout)
 
-        self.ik_calculations_position_future = self.ik_client.call_async(IK_request)
+        self.ik_calculations_position_future = self.ik_client.call_async(
+            IK_request)
 
-        self.ik_calculations_position_future.add_done_callback(self.future_position_callback)
+        self.ik_calculations_position_future.add_done_callback(
+            self.future_position_callback)
 
     def plan_path_to_orientation(self, orientation):
         """
@@ -335,9 +338,9 @@ class Wrapper:
         pose_stamped = self.pop_msgs.set_PoseStamp_orientation(orientation)
 
         robot_state = self.pop_msgs.set_RobotState(
-                                        frame_id=self.frame_id,
-                                        joint_names=self.joint_names,
-                                        position=self.joint_states)
+            frame_id=self.frame_id,
+            joint_names=self.joint_names,
+            position=self.joint_states)
         avoid_collisions = True
         timeout = self.pop_msgs.set_Duration(time=5)
 
@@ -368,9 +371,9 @@ class Wrapper:
         pose_stamped = self.pop_msgs.set_PoseStamp(point, orientation)
 
         robot_state = self.pop_msgs.set_RobotState(
-                                        frame_id=self.frame_id,
-                                        joint_names=self.joint_names,
-                                        position=self.joint_states)
+            frame_id=self.frame_id,
+            joint_names=self.joint_names,
+            position=self.joint_states)
         avoid_collisions = True
         timeout = self.pop_msgs.set_Duration(time=5)
 
@@ -379,7 +382,8 @@ class Wrapper:
 
         ik_calculations_future = self.ik_client.call_async(IK_request)
 
-        ik_calculations_future.add_done_callback(self.future_pos_orien_callback)
+        ik_calculations_future.add_done_callback(
+            self.future_pos_orien_callback)
 
     def add_box(self, position, side_length):
         """
@@ -425,7 +429,8 @@ class Wrapper:
         self.scene = future.result().scene
         self.scene.world.collision_objects.append(self.box_collision)
         self.scene.is_diff = True
-        future = self.apply_planning_scene.call_async(ApplyPlanningScene.Request(scene=self.scene))
+        future = self.apply_planning_scene.call_async(
+            ApplyPlanningScene.Request(scene=self.scene))
         future.add_done_callback(self.future_apply_scene_cb)
 
     def future_apply_scene_cb(self, future):
@@ -450,7 +455,7 @@ class Gripper:
     def create_close_grasp_msg(self):
         """Create a close grasp message."""
         grasp_msg = Grasp.Goal()
-        grasp_msg.width = 0.00  # with block
+        grasp_msg.width = -0.01  # with block
         # grasp_msg.width = 0.00  # without the block
         grasp_msg.speed = 0.1
         grasp_msg.force = 50.0
@@ -463,7 +468,7 @@ class Gripper:
     def create_open_grasp_msg(self):
         """Create an open grasp message."""
         grasp_msg = Grasp.Goal()
-        grasp_msg.width = 0.035
+        grasp_msg.width = 0.02
         grasp_msg.speed = 0.03
         grasp_msg.force = 50.0
         grasp_msg.epsilon.inner = 0.01
@@ -476,14 +481,16 @@ class Gripper:
         self.node.get_logger().info('In future2_callback for close', once=True)
         result = future.result()
         future_gripper = result.get_result_async()
-        future_gripper.add_done_callback(self.get_execute_gripper_close_result_cb)
+        future_gripper.add_done_callback(
+            self.get_execute_gripper_close_result_cb)
 
     def future_gripper_open_callback(self, future):
         """Send the result for execution."""
         self.node.get_logger().info('In future2_callback for open', once=True)
         result = future.result()
         future_gripper = result.get_result_async()
-        future_gripper.add_done_callback(self.get_execute_gripper_open_result_cb)
+        future_gripper.add_done_callback(
+            self.get_execute_gripper_open_result_cb)
 
     def get_execute_gripper_close_result_cb(self, future):
         """Change the state to done."""
