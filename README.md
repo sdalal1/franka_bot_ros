@@ -1,6 +1,8 @@
 # BotROS 
 Authors (Alphabetical): Nader Ahmed, Demiana Barsoum, Shail Dalal, Fiona Neylon, Courtney Smith
 
+**** Insert video here ****
+
 ## Overview
 The aim of this project was to dot paint an image using the Emika Franka Panda 7 DOF robot arm. The system utilizes computer vision and color detection to identify the location of the brushes and various paint colors on a palette. The robot then plans and excecutes trajectories using a custom MoveIt API. 
 
@@ -9,7 +11,8 @@ The aim of this project was to dot paint an image using the Emika Franka Panda 7
 2. Within the `ssh student@station`, `run ros2 launch franka_moveit_config moveit.launch.py use_rviz:=false robot_ip:=panda0.robot`
 3. From the workspace containing our packages, run `ros2 launch listen_apriltags aprilTags.launch.xml` to start the realsense camera, rviz, and the april_tag node
     - Before continuing, make sure there are no warnings within the tf tree in rviz and proceed
-4. **** Lastly, from the folder containing the desired image csv, run `ros2 run mattagascar iliketomoveitmoveit`
+4. **** Also in the workspace containing the packages, run `ros2 run CvBridge depth` to start the color detection of the paint locations.  
+5. **** Lastly, from the folder containing the desired image csv, run `ros2 run mattagascar iliketomoveitmoveit`
 
 ## Overall System Architecture and High Level 
 ### Packages:
