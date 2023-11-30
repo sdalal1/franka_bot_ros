@@ -48,13 +48,12 @@ class PopulateMsgs():
         self.state = State.NEUTRAL
         self.node = node
 
-
     # def set_CartesianTrajectoryMsgs(self, waypoints, orientations, dT, frame_id):
     #     ct_msg = CartesianTrajectory()
     #     points = []
     #     ct_msg.header.stamp = self.node.get_clock().now().to_msg()
     #     ct_msg.header.frame = frame_id
-        
+
     #     for p, o, dt in zip(waypoints, orientations, dT):
     #         points.append(self.set_CartesianTrajectoryPoint(p,o, dt))
 
@@ -73,13 +72,13 @@ class PopulateMsgs():
     #     cp_msg = CartesianPoint()
     #     cp_msg.pose = self.set_PoseMsgs(position, orientation)
     #     return cp_msg
-    
 
-    def set_GetCartesianPositionRqt(self, group_name, frame_id, position, joint_names, waypoints):  # max_step, jump_threshold):
+    # max_step, jump_threshold):
+    def set_GetCartesianPositionRqt(self, group_name, frame_id, position, joint_names, waypoints):
         cart_pos_rqst = GetCartesianPath.Request()
         cart_pos_rqst.header.stamp = self.node.get_clock().now().to_msg()
         cart_pos_rqst.header.frame_id = frame_id
-        
+
         # cart_pos_rqst.start_state = self.set_RobotState(frame_id, joint_names, position)
         cart_pos_rqst.group_name = group_name
         # weird: ask Matt why this is the case for it to work with either links
@@ -88,16 +87,15 @@ class PopulateMsgs():
         cart_pos_rqst.waypoints = waypoints  # this must be a list of Pose() msgs
         max_step = 0.05
         # not setting these will cause the motion to be fastttttt!
-        cart_pos_rqst.max_velocity_scaling_factor = 0.05
+        cart_pos_rqst.max_velocity_scaling_factor = 0.1
         cart_pos_rqst.max_acceleration_scaling_factor = 0.05
-        cart_pos_rqst.max_cartesian_speed = 0.05
+        cart_pos_rqst.max_cartesian_speed = 0.1
         # cart_pos_rqst.cartesian_speed_limited_link = 'panda_hand_tcp'
         cart_pos_rqst.cartesian_speed_limited_link = 'panda_link8'
         cart_pos_rqst.max_step = max_step
         # cart_pos_rqst.jump_threshold = jump_threshold
         return cart_pos_rqst
 
-    
     # def set_CartesianTrajectoryMsgs(self, waypoints, dT, frame_id):
     #     ct_msg = CartesianTrajectory()
     #     ct_msg.header.stamp = self.node.get_clock().now().to_msg()
@@ -117,13 +115,14 @@ class PopulateMsgs():
     #     dt_msg.sec = dt
     #     ctp_msg.time_from_start = dt_msg
     #     return ctp_msg
+
     def set_CartesianPoint(self, position):
         cp_msg = CartesianPoint()
         orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
         # orientation = Quaternion(x=0.92244, y=-0.38613, z=-0.00235, w=-0.000504)
         cp_msg.pose = self.set_PoseMsgs(position, orientation)
         return cp_msg
-    
+
     def set_PoseMsgs_position(self, position):
         pose_msgs = Pose()
         pose_msgs.position = position
@@ -215,7 +214,7 @@ class PopulateMsgs():
         plan_diff.world = PlanningSceneWorld()
         plan_diff.world.octomap = OctomapWithPose()
         plan_diff.world.octomap.header.stamp = self.node.get_clock(
-                                                    ).now().to_msg()
+        ).now().to_msg()
         plan_diff.world.octomap.header.frame_id = frame_id
 
         plan_diff.world.octomap.origin = Pose()
@@ -223,7 +222,7 @@ class PopulateMsgs():
         plan_diff.world.octomap.origin.orientation = Quaternion()
         plan_diff.world.octomap.octomap = Octomap()
         plan_diff.world.octomap.octomap.header.stamp = self.node.get_clock(
-                                                            ).now().to_msg()
+        ).now().to_msg()
         plan_diff.world.octomap.octomap.header.frame_id = frame_id
         plan_diff.world.octomap.octomap.binary = True
         return plan_diff
@@ -360,7 +359,7 @@ class PopulateMsgs():
 
         for position, joint_name in zip(positions, joint_names):
             goal_contraints[0].joint_constraints.append((
-                                        JointConstraint(joint_name=joint_name,
+                JointConstraint(joint_name=joint_name,
                                                         position=position,
                                                         tolerance_above=0.001,
                                                         tolerance_below=0.001,
