@@ -145,11 +145,11 @@ class ILikeToMoveItMoveIt(Node):
         self.listener = TransformListener(self.buffer, self)
         self.zoffset = 0.067
         # varibles for z
-        self.z_brush_standoff = 0.3 + self.zoffset
+        self.z_brush_standoff = 0.3 + self.zoffset + 0.1
         self.z_paint_standoff = 0.4 + self.zoffset
-        self.z_brush_dot = 0.125 + .045
+        self.z_brush_dot = 0.125 + .045 + 0.005
         self.z_paint_dip = 0.14 + .055
-        self.z_brush_dip = 0.16 + self.zoffset
+        self.z_brush_dip = 0.16 + self.zoffset + 0.012
         self.z_dot_standoff = 0.25
 
         # # paint standoff location
@@ -194,20 +194,24 @@ class ILikeToMoveItMoveIt(Node):
 
         self.current_waypoints = []
 
+        self.count_brush = 0
+
     def apriltagloc_cb(self, msg: Loc):
         # message type for the paint brush locations
         # self.get_logger().info(f'IN APRILTAGLOC_CB {msg}')
-        try:
-            self.brushlocs["purple"] = msg.purple
-            self.brushlocs["yellow"] = msg.yellow
+        if self.count_brush == 0:
+            try:
+                self.brushlocs["purple"] = msg.purple
+                self.brushlocs["yellow"] = msg.yellow
 
-            self.brushlocs["blue"] = msg.blue
-            self.brushlocs["green"] = msg.green
-            self.brushlocs["orange"] = msg.orange
-            self.brushlocs["palete"] = msg.palete
-            self.set_PaintLocs()
-        except:
-            self.get_logger().info('Brush Locations Not Initlaized Yet')
+                self.brushlocs["blue"] = msg.blue
+                self.brushlocs["green"] = msg.green
+                self.brushlocs["orange"] = msg.orange
+                self.brushlocs["palete"] = msg.palete
+                self.set_PaintLocs()
+                self.count_brush = 1
+            except:
+                self.get_logger().info('Brush Locations Not Initlaized Yet')
 
     def set_PaintLocs(self):
         try:
