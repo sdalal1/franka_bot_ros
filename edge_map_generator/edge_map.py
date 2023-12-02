@@ -58,10 +58,10 @@ def edge_map(image,skip_points):
     plt.show()
     return edges, total_points
 
-def simple_circle():
-    x_range = (-0.2538, 0.1996)
-    y_range = (0.4788, 0.73217)
-
+def simple_circle(circle_range):
+    
+    x_range, y_range = circle_range
+    
     points = []
     for i in range(0, 360, 15):
         angle = i * np.pi / 180  # cvt to radians
@@ -76,8 +76,6 @@ def simple_circle():
     # ax.scatter(*zip(*points))
     # plt.show()
     return points
-
-
 
 def map_points_to_range(points, x_range, y_range):
     x_coords = [p[0] for p in points]
@@ -121,35 +119,36 @@ def create_hexagon(center, diameter):
     angle_offset = np.pi / 6  
     return patches.RegularPolygon(center, numVertices=6, radius=radius, orientation=angle_offset, fill=True)
 
-def generate_circle_jsons():
-    points = simple_circle() 
-    circle_points_alternating = {"navy": [], "gold": []}
+def generate_circle_jsons(range):
+    
+    points = simple_circle(range) 
+    circle_points_alternating = {"purple": [], "yellow": []}
     for i, point in enumerate(points):
         if i % 2 == 0:
-            circle_points_alternating["navy"].append(point)
+            circle_points_alternating["purple"].append(point)
         else:
-            circle_points_alternating["gold"].append(point)
+            circle_points_alternating["yellow"].append(point)
             
     save_to_json(circle_points_alternating, "color_switch_circle_pts.json")
     
-    #plot the navy and gold points 
+    #plot the purple and yellow points 
     fig, ax = plt.subplots(figsize=(8, 6))
-    plt.plot(*zip(*circle_points_alternating["navy"]), marker='o', color='navy', ls='')
-    plt.plot(*zip(*circle_points_alternating["gold"]), marker='o', color='gold', ls='')
+    plt.plot(*zip(*circle_points_alternating["purple"]), marker='o', color='purple', ls='')
+    plt.plot(*zip(*circle_points_alternating["yellow"]), marker='o', color='yellow', ls='')
     plt.show()
     
-    #make half of the points navy and half of the points gold (NOT ALTERNATING)
-    circle_points_half = {"navy": [], "gold": []}
+    #make half of the points purple and half of the points yellow (NOT ALTERNATING)
+    circle_points_half = {"purple": [], "yellow": []}
 
     for i,point in enumerate(points):
         if i < len(points) / 2:
-            circle_points_half["navy"].append(point)
+            circle_points_half["purple"].append(point)
         else:
-            circle_points_half["gold"].append(point)
+            circle_points_half["yellow"].append(point)
 
     fig, ax = plt.subplots(figsize=(8, 6))
-    plt.plot(*zip(*circle_points_half["navy"]), marker='o', color='navy', ls='')
-    plt.plot(*zip(*circle_points_half["gold"]), marker='o', color='gold', ls='')
+    plt.plot(*zip(*circle_points_half["purple"]), marker='o', color='purple', ls='')
+    plt.plot(*zip(*circle_points_half["yellow"]), marker='o', color='yellow', ls='')
     plt.show()
     save_to_json(circle_points_alternating, "circle_half_and_half.json")
     
@@ -163,8 +162,8 @@ def make_college_logo(img_filename, json_filename, skip_points, range):
     print("Number of points: ", len(mapped_points))
 
     points_dict = {} 
-    points_dict["navy"] = inner_points
-    points_dict["gold"] = border_points
+    points_dict["purple"] = inner_points
+    points_dict["yellow"] = border_points
 
     fig, ax = plt.subplots(figsize=(8, 6))
     plt.xlim(x_range)
@@ -172,12 +171,12 @@ def make_college_logo(img_filename, json_filename, skip_points, range):
     
     # Plotting circles for inner points
     for x, y in inner_points:
-        circle = patches.Circle((x, y), 0.02 / 2, color='navy', fill=True)  # Diameter 0.025 meters
+        circle = patches.Circle((x, y), 0.02 / 2, color='red', fill=True)  # Diameter 0.025 meters
         ax.add_patch(circle)
 
     # Plotting circles for border points
     for x, y in border_points:
-        circle = patches.Circle((x, y), 0.02 / 2, color='gold', fill=True)  # Diameter 0.025 meters
+        circle = patches.Circle((x, y), 0.02 / 2, color='yellow', fill=True)  # Diameter 0.025 meters
         ax.add_patch(circle)
 
     ax.set_aspect('equal', adjustable='datalim')
@@ -192,9 +191,14 @@ def make_college_logo(img_filename, json_filename, skip_points, range):
 
 def main():
 
-    knoxville_range = ((-0.2538, 0.0), (0.4788, 0.73217))
+    knoxville_range = ((-0.2538, 0.0), 
+                       (0.4788, 0.73217))
     
-    notre_dame_range = ((-0.2538, 0.1996),(0.4788, 0.73217))
+    notre_dame_range = ((-0.2538, 0.17),
+                        (0.4788, 0.73217))
+    
+    maryland_range = ((-0.2538, 0.17),
+                      (0.4788, 0.73217))
     
     make_college_logo(img_filename="knoxville.png", 
                      json_filename="knoxville.json", 
@@ -205,6 +209,17 @@ def main():
                      json_filename="notre_dame.json", 
                      skip_points=13,
                      range=notre_dame_range)
+
+    make_college_logo(img_filename="maryland.png", 
+                     json_filename="maryland.json", 
+                     skip_points=80,
+                     range=maryland_range)
+    
+
+    circle_range = ((-0.2538, 0.17), #xrange
+                    (0.4788, 0.73217)) #yrange
+    generate_circle_jsons(circle_range)
+    
     
     # # save_to_csv(mapped_points, "N_points.csv")
     # with open('notre_dame_points.json', 'w') as fp:

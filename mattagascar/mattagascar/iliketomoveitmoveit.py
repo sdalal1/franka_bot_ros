@@ -166,9 +166,9 @@ class ILikeToMoveItMoveIt(Node):
         # varibles for z
         self.z_brush_standoff = 0.3 + self.zoffset + 0.1
         self.z_paint_standoff = 0.4 + self.zoffset
-        self.z_brush_dot = 0.125 + .045 + 0.005
+        self.z_brush_dot = 0.125 + .045 + 0.012  # 0.01
         self.z_paint_dip = 0.14 + .055
-        self.z_brush_dip = 0.16 + self.zoffset + 0.012
+        self.z_brush_dip = 0.16 + self.zoffset + 0.010  # 0.012
         self.z_dot_standoff = 0.25
 
         # # paint standoff location
@@ -384,6 +384,15 @@ class ILikeToMoveItMoveIt(Node):
 
             else:
                 print("got to else statement so not too bad")
+                if self.count % 5 == 0 or self.count == 0:
+                    print("am I in here?")
+                    # NOTE: needs paint
+                    # Updating pallete location from the dictionary to the message we are sending.
+                    self.set_PaintLocs()
+                    msg_waypoints.append(self.paint_location_standoff)
+                    msg_waypoints.append(self.paint_location_dip)
+                    msg_waypoints.append(self.paint_location_standoff)
+                
                 standoff = Pose()
                 standoff.position.x = self.current_waypoints[0][0]
                 standoff.position.y = self.current_waypoints[0][1]
@@ -409,14 +418,14 @@ class ILikeToMoveItMoveIt(Node):
                 print("Got through this")
 
                 # can do 15 points before needing to refill
-                if self.count % 5 == 0:
-                    print("am I in here?")
-                    # NOTE: needs paint
-                    # Updating pallete location from the dictionary to the message we are sending.
-                    self.set_PaintLocs()
-                    msg_waypoints.append(self.paint_location_standoff)
-                    msg_waypoints.append(self.paint_location_dip)
-                    msg_waypoints.append(self.paint_location_standoff)
+                # if self.count % 5 == 0 or self.count == 0:
+                #     print("am I in here?")
+                #     # NOTE: needs paint
+                #     # Updating pallete location from the dictionary to the message we are sending.
+                #     self.set_PaintLocs()
+                #     msg_waypoints.append(self.paint_location_standoff)
+                #     msg_waypoints.append(self.paint_location_dip)
+                #     msg_waypoints.append(self.paint_location_standoff)
                 print("msg_waypoints", msg_waypoints)
                 # from IPython import embed; embed()
                 self.KingJulien.plan_path_cartesian(msg_waypoints)
@@ -491,6 +500,7 @@ class ILikeToMoveItMoveIt(Node):
             # For chaning the gripper request queue
             self.con = 0
             self.con1 = 0
+            self.count = 0 # reset so when it gets 2nd color, it gets paint first before dotting
 
             self.current_color = self.color_list[self.current_color_idx]
             self.state = State.PICKUP
