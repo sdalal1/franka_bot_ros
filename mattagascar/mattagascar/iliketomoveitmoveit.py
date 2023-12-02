@@ -100,10 +100,13 @@ class ILikeToMoveItMoveIt(Node):
         image = json.load(f)
         self.color_list = list(image.keys())
         self.waypoints = []
+
         for color in self.color_list:
             points  = image[color]
             self.waypoints.append(points)
-                
+
+        print(f'waypoints: {self.waypoints}')   
+        print(f'shape of waypoints: {len(self.waypoints[0]), len(self.waypoints[0][0])}') 
         f.close()
 
         # coordinate_x, coordinate_y = np.loadtxt(
@@ -138,7 +141,7 @@ class ILikeToMoveItMoveIt(Node):
         # print("waypoints here", self.waypoints_border)
 
         # coordinate_list_N = []
-        # self.brushlocs = {}
+        self.brushlocs = {}
 
         # for x, y in zip(coordinate_x_N, coordinate_y_N):
         #     point = (x, y)
