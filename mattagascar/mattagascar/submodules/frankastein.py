@@ -23,7 +23,7 @@ from moveit_msgs.srv import GetPositionIK, GetPlanningScene, ApplyPlanningScene,
 from shape_msgs.msg import SolidPrimitive
 from .populate_msg import PopulateMsgs
 from enum import Enum, auto
-from franka_msgs.action import Grasp
+from franka_msgs.action import Grasp, Move
 
 
 class FRANKA(Enum):
@@ -451,34 +451,53 @@ class Gripper:
         self.state = FRANKA.OPEN
         self.gripper_client = ActionClient(self.node, Grasp,
                                            "panda_gripper/grasp")
+        
+        self.open_client = ActionClient(self.node, Move, 
+                                            "panda_gripper/move")
 
     def create_close_grasp_msg(self):
         """Create a close grasp message."""
+        self.node.get_logger().info('CREATED NEW CLOSE GRASP REQUEST')
+
         grasp_msg = Grasp.Goal()
-        grasp_msg.width = -0.015  # with block
-        # grasp_msg.width = 0.00  # without the block
+        # grasp_msg.width = -0.015  # with block
+        grasp_msg.width = -0.015  # without the block
         grasp_msg.speed = 0.1
         grasp_msg.force = 50.0
         grasp_msg.epsilon.inner = 0.01
         grasp_msg.epsilon.outer = 0.01
-
         future_gripper = self.gripper_client.send_goal_async(grasp_msg)
         future_gripper.add_done_callback(self.future_gripper_close_callback)
 
+        # close_msg = Move.Goal()
+        # close_msg.width = 0.009
+        # close_msg.speed = 0.1
+        # future_gripper = self.open_client.send_goal_async(close_msg)
+        # future_gripper.add_done_callback(self.future_gripper_close_callback)
+
+        
     def create_open_grasp_msg(self):
         """Create an open grasp message."""
-        grasp_msg = Grasp.Goal()
-        grasp_msg.width = 0.02
-        grasp_msg.speed = 0.03
-        grasp_msg.force = 50.0
-        grasp_msg.epsilon.inner = 0.01
-        grasp_msg.epsilon.outer = 0.01
-        future_gripper = self.gripper_client.send_goal_async(grasp_msg)
+        self.node.get_logger().info('CREATED NEW OPEN GRASP REQUEST')
+
+        # grasp_msg = Grasp.Goal()
+        # grasp_msg.width = 0.3
+        # grasp_msg.speed = 0.1
+        # grasp_msg.force = 0.0
+        # grasp_msg.epsilon.inner = 0.01
+        # grasp_msg.epsilon.outer = 0.01
+        # future_gripper = self.gripper_client.send_goal_async(grasp_msg)
+        # future_gripper.add_done_callback(self.future_gripper_open_callback)
+
+        open_msg = Move.Goal()
+        open_msg.width = 0.3
+        open_msg.speed = 0.1
+        future_gripper = self.open_client.send_goal_async(open_msg)
         future_gripper.add_done_callback(self.future_gripper_open_callback)
 
     def future_gripper_close_callback(self, future):
         """Send the result for execution."""
-        self.node.get_logger().info('In future2_callback for close', once=True)
+        self.node.get_logger().info('In future2_callback for close')
         result = future.result()
         future_gripper = result.get_result_async()
         future_gripper.add_done_callback(
@@ -486,7 +505,7 @@ class Gripper:
 
     def future_gripper_open_callback(self, future):
         """Send the result for execution."""
-        self.node.get_logger().info('In future2_callback for open', once=True)
+        self.node.get_logger().info('In future2_callback for open')
         result = future.result()
         future_gripper = result.get_result_async()
         future_gripper.add_done_callback(
@@ -498,5 +517,7 @@ class Gripper:
         self.state = FRANKA.CLOSE
 
     def get_execute_gripper_open_result_cb(self, future):
+        self.node.get_logger().info('about to set state to open')
+
         # if self.state == FRANKA.CLOSE:
         self.state = FRANKA.OPEN

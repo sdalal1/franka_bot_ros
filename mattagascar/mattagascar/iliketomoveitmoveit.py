@@ -61,8 +61,9 @@ class ILikeToMoveItMoveIt(Node):
         super().__init__("iliketomoveitmoveit")
         self.KingJulien = Wrapper(self, robot_type='panda_manipulator')
         self.Mort = FRANKA
+        self.con1 = 0
         self.grasping = Gripper(self)
-
+        self.con = 0
         self.orientation = Quaternion(
             x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
         # self.orientation = Quaternion(x=1.0, y=0.0, z=0.0, w=0.0)
@@ -75,6 +76,7 @@ class ILikeToMoveItMoveIt(Node):
         # self.state = State.PICKUP
         self.orientation1 = self.orientation
         self.state = State.START
+        # self.state = State.GRIPPEROPEN
         # self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
@@ -96,13 +98,13 @@ class ILikeToMoveItMoveIt(Node):
 
         # coordinate_x_border = coordinate_x[:63]
         # coordinate_y_border = coordinate_y[:63]
-        coordinate_x_border = coordinate_x[:5]
-        coordinate_y_border = coordinate_y[:5]
+        coordinate_x_border = coordinate_x[:1]
+        coordinate_y_border = coordinate_y[:1]
 
         # coordinate_x_N = coordinate_x[63:]
         # coordinate_y_N = coordinate_y[63:]
-        coordinate_x_N = coordinate_x[5:10]
-        coordinate_y_N = coordinate_y[5:10]
+        coordinate_x_N = coordinate_x[1:10]
+        coordinate_y_N = coordinate_y[1:10]
 
         # print(coordinate_x_N)
         # print(coordinate_y_N)
@@ -316,7 +318,9 @@ class ILikeToMoveItMoveIt(Node):
 
         elif self.state == State.GRIPPERCLOSE:
             self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPERCLOSING', once=True)
-            self.grasp_close_goal = self.grasping.create_close_grasp_msg()
+            if self.con1 ==0:
+                self.grasp_close_goal = self.grasping.create_close_grasp_msg()
+                self.con1 = 1
             if self.grasping.state == self.Mort.CLOSE:
                 # needs to go to standoff position of paintbursh to pick it up
                 self.state = State.PICKBRUSH
@@ -448,20 +452,29 @@ class ILikeToMoveItMoveIt(Node):
 
         elif self.state == State.GRIPPEROPEN:
             self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPEROPENING', once=True)
-            self.grasp_open_goal = self.grasping.create_open_grasp_msg()
+            if self.con ==0:
+                self.get_logger().info('ABOUT TO SEND AN OPEN GRASP REQ', once=True)
+                self.grasp_open_goal = self.grasping.create_open_grasp_msg()
+                self.get_logger().info('rRETURNED FROM OPEN REQUEST', once=True)
 
+                self.con =1
             if self.grasping.state == self.Mort.OPEN:
-                self.state = State.START
-
-            if len(self.waypoints) != 0:
-                self.state = State.CHANGE_COLOR
-            else:
-                self.state = State.FINISHED
-                self.get_logger().info("Going into finished state")
-                finsihed = input("Enter f to finish: ")
+                # self.state = State.START
+                print("got to grasping and about to see if we can change colors")
+                if len(self.waypoints) != 0:
+                    self.get_logger().info("going to change color and then pack to pickup state")
+                    self.state = State.CHANGE_COLOR
+                else:
+                    self.state = State.FINISHED
+                    self.get_logger().info("Going into finished state")
+                    finsihed = input("Enter f to finish: ")
 
         elif self.state == State.CHANGE_COLOR:
             self.current_color_idx += 1
+            # For chaning the gripper request queue
+            self.con = 0
+            self.con1 = 0
+            
             self.current_color = self.color_list[self.current_color_idx]
             self.state = State.PICKUP
 
