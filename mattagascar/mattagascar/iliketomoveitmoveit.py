@@ -12,6 +12,7 @@ import tf2_ros
 from tf2_ros.transform_listener import TransformListener
 from tf2_ros.buffer import Buffer
 import pandas as pd
+import json
 
 
 class State(Enum):
@@ -91,6 +92,22 @@ class ILikeToMoveItMoveIt(Node):
 
         # coordinate_x_border, coordinate_y_border = pd.read_csv('N_points.csv', sep='\t', header=None).iloc[:, :63].values.tolist()
         # coordinate_x_N, coordinate_y_N = pd.read_csv('N_points.csv', sep='\t', header=None).iloc[:, 63:].values.tolist()
+
+        # Opening JSON file
+        # f = open('alt_circle.json')
+        
+        # # returns JSON object as 
+        # # a dictionary
+        # image = json.load(f)
+        # self.color_list = list(image.keys())
+        # self.waypoints = []
+        # for color in self.color_list:
+            # points  = image[color]
+            # self.waypoints.append()
+                # 
+        
+        # # Closing file
+        # f.close()
 
         coordinate_x, coordinate_y = np.loadtxt(
             'N_points.csv', unpack=True, delimiter='\t')
@@ -474,7 +491,7 @@ class ILikeToMoveItMoveIt(Node):
             # For chaning the gripper request queue
             self.con = 0
             self.con1 = 0
-            
+
             self.current_color = self.color_list[self.current_color_idx]
             self.state = State.PICKUP
 
