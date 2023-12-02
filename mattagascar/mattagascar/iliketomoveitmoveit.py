@@ -94,34 +94,31 @@ class ILikeToMoveItMoveIt(Node):
         # coordinate_x_N, coordinate_y_N = pd.read_csv('N_points.csv', sep='\t', header=None).iloc[:, 63:].values.tolist()
 
         # Opening JSON file
-        # f = open('alt_circle.json')
-        
-        # # returns JSON object as 
-        # # a dictionary
-        # image = json.load(f)
-        # self.color_list = list(image.keys())
-        # self.waypoints = []
-        # for color in self.color_list:
-            # points  = image[color]
-            # self.waypoints.append()
-                # 
-        
-        # # Closing file
-        # f.close()
+        f = open('color_switch_circle_pts.json')
+        # returns JSON object as 
+        # a dictionary
+        image = json.load(f)
+        self.color_list = list(image.keys())
+        self.waypoints = []
+        for color in self.color_list:
+            points  = image[color]
+            self.waypoints.append(points)
+                
+        f.close()
 
-        coordinate_x, coordinate_y = np.loadtxt(
-            'N_points.csv', unpack=True, delimiter='\t')
+        # coordinate_x, coordinate_y = np.loadtxt(
+        #     'N_points.csv', unpack=True, delimiter='\t')
         # coordinate_x_N, coordinate_y_N = np.loadtxt('N_points.csv', unpack= True, delimiter='\t')
 
         # coordinate_x_border = coordinate_x[:63]
         # coordinate_y_border = coordinate_y[:63]
-        coordinate_x_border = coordinate_x[:1]
-        coordinate_y_border = coordinate_y[:1]
+        # coordinate_x_border = coordinate_x[:1]
+        # coordinate_y_border = coordinate_y[:1]
 
         # coordinate_x_N = coordinate_x[63:]
         # coordinate_y_N = coordinate_y[63:]
-        coordinate_x_N = coordinate_x[1:10]
-        coordinate_y_N = coordinate_y[1:10]
+        # coordinate_x_N = coordinate_x[1:10]
+        # coordinate_y_N = coordinate_y[1:10]
 
         # print(coordinate_x_N)
         # print(coordinate_y_N)
@@ -130,31 +127,31 @@ class ILikeToMoveItMoveIt(Node):
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
         # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
 
-        coordinate_list_border = []
-        self.brushlocs = {}
-
-        for x, y in zip(coordinate_x_border, coordinate_y_border):
-            point = (x, y)
-            coordinate_list_border.append(point)
-
-        self.waypoints_border = coordinate_list_border
-        # print("waypoints here", self.waypoints_border)
-
-        coordinate_list_N = []
+        # coordinate_list_border = []
         # self.brushlocs = {}
 
-        for x, y in zip(coordinate_x_N, coordinate_y_N):
-            point = (x, y)
-            coordinate_list_N.append(point)
+        # for x, y in zip(coordinate_x_border, coordinate_y_border):
+        #     point = (x, y)
+        #     coordinate_list_border.append(point)
 
-        self.waypoints_N = coordinate_list_N
+        # self.waypoints_border = coordinate_list_border
+        # print("waypoints here", self.waypoints_border)
 
-        self.waypoints = []
-        self.waypoints.append(self.waypoints_border)
-        self.waypoints.append(self.waypoints_N)
+        # coordinate_list_N = []
+        # self.brushlocs = {}
+
+        # for x, y in zip(coordinate_x_N, coordinate_y_N):
+        #     point = (x, y)
+        #     coordinate_list_N.append(point)
+
+        # self.waypoints_N = coordinate_list_N
+
+        # self.waypoints = []
+        # self.waypoints.append(self.waypoints_border)
+        # self.waypoints.append(self.waypoints_N)
 
         # self.total_colors = len(self.waypoints)
-        self.color_list = ['yellow', 'purple']
+        # self.color_list = ['yellow', 'purple']
 
         self.current_color_idx = 0
         self.current_color = self.color_list[self.current_color_idx]
