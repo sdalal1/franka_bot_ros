@@ -44,7 +44,6 @@ class ImageListener(Node):
         self.cx_orange = None
         self.cy_orange = None
 
-
         self.intrinsics = None
         # cv2.namedWindow('trackbar', cv2.WINDOW_NORMAL)
         # cv2.createTrackbar('LowH_purple','trackbar',0,179,self.nothing)
@@ -88,7 +87,6 @@ class ImageListener(Node):
         # cv2.createTrackbar('HighS_orange', 'trackbar', 0, 255, self.nothing)
         # cv2.createTrackbar('LowV_orange', 'trackbar', 0, 255, self.nothing)
         # cv2.createTrackbar('HighV_orange', 'trackbar', 0, 255, self.nothing)
-
 
     def camera_info_cb(self, msg):
         value = msg.k
@@ -218,7 +216,6 @@ class ImageListener(Node):
 
         orange_mask = cv2.inRange(hsv, lower_orange, upper_orange)
 
-
         kernel_size = (5, 5)
         kernelo = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_size)
         kernel_sizec = (20, 20)
@@ -252,13 +249,16 @@ class ImageListener(Node):
                     biggest_contour = contours[a]
 
             M = cv2.moments(biggest_contour)
-            self.cx_purple = int(M['m10']/M['m00'])
-            self.cy_purple = int(M['m01']/M['m00'])
+            try:
+                self.cx_purple = int(M['m10']/M['m00'])
+                self.cy_purple = int(M['m01']/M['m00'])
 
-            cv2.circle(masked, (self.cx_purple, self.cy_purple),
-                       3, (255, 255, 255), -1)
-            cv2.putText(masked, 'purple_centroid', (self.cx_purple-10, self.cy_purple-10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.circle(masked, (self.cx_purple, self.cy_purple),
+                           3, (255, 255, 255), -1)
+                cv2.putText(masked, 'purple_centroid', (self.cx_purple-10, self.cy_purple-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            except:
+                self.get_logger().info("purple not detected")
 
         contours, hierarchy = cv2.findContours(
             img_close_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -270,15 +270,17 @@ class ImageListener(Node):
             for a in range(0, len(contours)):
                 if cv2.contourArea(contours[a]) > cv2.contourArea(biggest_contour):
                     biggest_contour = contours[a]
-
             M = cv2.moments(biggest_contour)
-            self.cx_yellow = int(M['m10']/M['m00'])
-            self.cy_yellow = int(M['m01']/M['m00'])
+            try:
+                self.cx_yellow = int(M['m10']/M['m00'])
+                self.cy_yellow = int(M['m01']/M['m00'])
 
-            cv2.circle(masked, (self.cx_yellow, self.cy_yellow),
-                       3, (255, 255, 255), -1)
-            cv2.putText(masked, 'yellow_centroid', (self.cx_yellow-10, self.cy_yellow-10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.circle(masked, (self.cx_yellow, self.cy_yellow),
+                           3, (255, 255, 255), -1)
+                cv2.putText(masked, 'yellow_centroid', (self.cx_yellow-10, self.cy_yellow-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            except:
+                self.get_logger().info("yellow not detected")
 
         contours, hierarchy = cv2.findContours(
             img_close_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -292,16 +294,18 @@ class ImageListener(Node):
                     biggest_contour = contours[a]
 
             M = cv2.moments(biggest_contour)
-            self.cx_red = int(M['m10']/M['m00'])
-            self.cy_red = int(M['m01']/M['m00'])
+            try:
+                self.cx_red = int(M['m10']/M['m00'])
+                self.cy_red = int(M['m01']/M['m00'])
+                cv2.circle(masked, (self.cx_red, self.cy_red),
+                           3, (255, 255, 255), -1)
+                cv2.putText(masked, 'red_centroid', (self.cx_red-10, self.cy_red-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            except:
+                self.get_logger().info("red not detected")
 
-            cv2.circle(masked, (self.cx_red, self.cy_red),
-                       3, (255, 255, 255), -1)
-            cv2.putText(masked, 'red_centroid', (self.cx_red-10, self.cy_red-10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-            
         contours, hierarchy = cv2.findContours(
-            img_close_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
+            img_close_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # print(len(contours))
 
         biggest_contour = 0
@@ -312,14 +316,17 @@ class ImageListener(Node):
                     biggest_contour = contours[a]
 
             M = cv2.moments(biggest_contour)
-            self.cx_blue = int(M['m10']/M['m00'])
-            self.cy_blue = int(M['m01']/M['m00'])
+            try:
+                self.cx_blue = int(M['m10']/M['m00'])
+                self.cy_blue = int(M['m01']/M['m00'])
 
-            cv2.circle(masked, (self.cx_blue, self.cy_blue),
-                       3, (255, 255, 255), -1)
-            cv2.putText(masked, 'blue_centroid', (self.cx_blue-10, self.cy_blue-10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-            
+                cv2.circle(masked, (self.cx_blue, self.cy_blue),
+                           3, (255, 255, 255), -1)
+                cv2.putText(masked, 'blue_centroid', (self.cx_blue-10, self.cy_blue-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            except:
+                self.get_logger().info("blue not detected")
+
         contours, hierarchy = cv2.findContours(
             green_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # print(len(contours))
@@ -332,14 +339,16 @@ class ImageListener(Node):
                     biggest_contour = contours[a]
 
             M = cv2.moments(biggest_contour)
-            self.cx_green = int(M['m10']/M['m00'])
-            self.cy_green = int(M['m01']/M['m00'])
+            try:
+                self.cx_green = int(M['m10']/M['m00'])
+                self.cy_green = int(M['m01']/M['m00'])
 
-            cv2.circle(masked, (self.cx_green, self.cy_green),
-                       3, (255, 255, 255), -1)
-            cv2.putText(masked, 'green_centroid', (self.cx_green-10, self.cy_green-10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-        
+                cv2.circle(masked, (self.cx_green, self.cy_green),
+                           3, (255, 255, 255), -1)
+                cv2.putText(masked, 'green_centroid', (self.cx_green-10, self.cy_green-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            except:
+                self.get_logger().info("green not detected")
 
         contours, hierarchy = cv2.findContours(
             orange_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -353,17 +362,20 @@ class ImageListener(Node):
                     biggest_contour = contours[a]
 
             M = cv2.moments(biggest_contour)
-            self.cx_orange = int(M['m10']/M['m00'])
-            self.cy_orange = int(M['m01']/M['m00'])
+            try:
+                self.cx_orange = int(M['m10']/M['m00'])
+                self.cy_orange = int(M['m01']/M['m00'])
 
-            cv2.circle(masked, (self.cx_orange, self.cy_orange),
-                       3, (255, 255, 255), -1)
-            cv2.putText(masked, 'orange_centroid', (self.cx_orange-10, self.cy_orange-10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-            
+                cv2.circle(masked, (self.cx_orange, self.cy_orange),
+                           3, (255, 255, 255), -1)
+                cv2.putText(masked, 'orange_centroid', (self.cx_orange-10, self.cy_orange-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            except:
+                self.get_logger().info("orange not detected")
+
         conto = cv2.drawContours(masked, contours, -1, (0, 255, 0), 3)
 
-        # cv2.imshow('Thresh', conto)
+        cv2.imshow('Thresh', conto)
         # cv2.setMouseCallback('Thresh', self.click_event)
 
         # # cv2.namedWindow('purple', cv2.WINDOW_NORMAL)
@@ -384,7 +396,7 @@ class ImageListener(Node):
         # cv2.namedWindow('orange', cv2.WINDOW_NORMAL)
         # cv2.imshow('orange',orange_mask)
 
-        # cv2.waitKey(1)
+        cv2.waitKey(1)
         # self.get_logger().info(f"finish? {cx_purple, cx_red, cx_yellow}")
 
     def broadcaster(self, tagpos):
@@ -445,7 +457,7 @@ class ImageListener(Node):
             g.transform.translation.z = red_pos[2]
 
             self.tf_broadcaster.sendTransform(g)
-        
+
         if self.cx_blue is not None and self.cy_blue is not None:
             blue_pos = rs2.rs2_deproject_pixel_to_point(
                 self.intrinsics, [self.cx_blue, self.cy_blue], depth)
@@ -464,7 +476,7 @@ class ImageListener(Node):
             y.transform.translation.z = blue_pos[2]
 
             self.tf_broadcaster.sendTransform(y)
-        
+
         if self.cx_green is not None and self.cy_green is not None:
             green_pos = rs2.rs2_deproject_pixel_to_point(
                 self.intrinsics, [self.cx_green, self.cy_green], depth)
@@ -483,7 +495,7 @@ class ImageListener(Node):
             o.transform.translation.z = green_pos[2]
 
             self.tf_broadcaster.sendTransform(o)
-        
+
         if self.cx_orange is not None and self.cy_orange is not None:
             orange_pos = rs2.rs2_deproject_pixel_to_point(
                 self.intrinsics, [self.cx_orange, self.cy_orange], depth)

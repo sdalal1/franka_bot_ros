@@ -1,0 +1,20 @@
+digraph G {
+"calibration" -> "panda_link0"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"camera_color_optical_frame" -> "calibration"[label=" Broadcaster: default_authority\nAverage rate: 6.186\nBuffer length: 5.011\nMost recent transform: 1701567834.885438\nOldest transform: 1701567829.874433\n"];
+"camera_link" -> "camera_depth_frame"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"camera_depth_frame" -> "camera_depth_optical_frame"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"camera_link" -> "camera_color_frame"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"camera_color_frame" -> "camera_color_optical_frame"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"camera_color_optical_frame" -> "yellow_color"[label=" Broadcaster: default_authority\nAverage rate: 10.961\nBuffer length: 4.926\nMost recent transform: 1701567834.996997\nOldest transform: 1701567830.070622\n"];
+"camera_color_optical_frame" -> "purple_color"[label=" Broadcaster: default_authority\nAverage rate: 10.961\nBuffer length: 4.926\nMost recent transform: 1701567834.99714\nOldest transform: 1701567830.070771\n"];
+"camera_color_optical_frame" -> "red_color"[label=" Broadcaster: default_authority\nAverage rate: 10.961\nBuffer length: 4.926\nMost recent transform: 1701567834.99718\nOldest transform: 1701567830.070815\n"];
+"camera_color_optical_frame" -> "blue_color"[label=" Broadcaster: default_authority\nAverage rate: 10.961\nBuffer length: 4.926\nMost recent transform: 1701567834.997221\nOldest transform: 1701567830.070846\n"];
+"camera_color_optical_frame" -> "green_color"[label=" Broadcaster: default_authority\nAverage rate: 10.961\nBuffer length: 4.926\nMost recent transform: 1701567834.997257\nOldest transform: 1701567830.070876\n"];
+"camera_color_optical_frame" -> "orange_color"[label=" Broadcaster: default_authority\nAverage rate: 10.961\nBuffer length: 4.926\nMost recent transform: 1701567834.997284\nOldest transform: 1701567830.070906\n"];
+"camera_color_optical_frame" -> "brush"[label=" Broadcaster: default_authority\nAverage rate: 6.186\nBuffer length: 5.011\nMost recent transform: 1701567834.885438\nOldest transform: 1701567829.874433\n"];
+"camera_color_optical_frame" -> "paint"[label=" Broadcaster: default_authority\nAverage rate: 6.186\nBuffer length: 5.011\nMost recent transform: 1701567834.885438\nOldest transform: 1701567829.874433\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1701567835.0988915"[ shape=plaintext ] ;
+}->"camera_link";
+}

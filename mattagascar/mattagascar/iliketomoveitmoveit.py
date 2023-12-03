@@ -67,104 +67,35 @@ class ILikeToMoveItMoveIt(Node):
         self.con = 0
         self.orientation = Quaternion(
             x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
-        # self.orientation = Quaternion(x=1.0, y=0.0, z=0.0, w=0.0)
 
-        # self.orientation1 = Quaternion(x=0.92207, y=-0.38701, z=0.0015236, w=0.0000015281)
-        # self.orientation1 = Quaternion(x=0.91771, y=-0.39138, z=0.061203, w=-0.029574)
-        # self.orientation = self.orientation1
-        # self.orientation = Quaternion(x=0.9318, y=-0.36271, z=0.01347, w=-0.0041108)
-        # self.orientation1 = Quaternion(x=0.93021, y=-0.36504, z=-0.022291, w=-0.030873)
-        # self.state = State.PICKUP
         self.orientation1 = self.orientation
         self.state = State.START
-        # self.state = State.GRIPPEROPEN
-        # self.KingJulien.add_box([0.0, 0.0, -0.6], 1.0)
 
         self.timer = self.create_timer(1/100, callback=self.timer_callback)
         self.apriltagsub = self.create_subscription(
             Loc, "paint_loc", self.apriltagloc_cb, 10)
 
-        # from IPython import embed; embed()
-        # coordinate_x, coordinate_y = np.loadtxt('circle_points_many.csv', unpack= True, delimiter=',')
-        # coordinate_x, coordinate_y = np.loadtxt('fiona.csv', unpack= True, delimiter=',')
-        # coordinate_x, coordinate_y = np.loadtxt('nader.csv', unpack= True, delimiter=',')
-        # coordinate_x, coordinate_y = np.loadtxt('N_points.csv', unpack= True, delimiter='\t')
-
-        # coordinate_x_border, coordinate_y_border = pd.read_csv('N_points.csv', sep='\t', header=None).iloc[:, :63].values.tolist()
-        # coordinate_x_N, coordinate_y_N = pd.read_csv('N_points.csv', sep='\t', header=None).iloc[:, 63:].values.tolist()
-
-        # Opening JSON file
-        # f = open('color_switch_circle_pts.json')
-        file_name = 'N_points.json'
+        file_name = 'maryland.json'
         f = open(file_name)
-        # returns JSON object as
-        # a dictionary
         image = json.load(f)
         self.color_list = list(image.keys())
         self.waypoints = []
 
         for color in self.color_list:
-            points  = image[color]
+            points = image[color]
             self.waypoints.append(points)
 
-        print(f"loaded in {file_name}")
+        # self.waypoints[0] = self.waypoints[0][-1:]
         f.close()
-
-        # coordinate_x, coordinate_y = np.loadtxt(
-        #     'N_points.csv', unpack=True, delimiter='\t')
-        # coordinate_x_N, coordinate_y_N = np.loadtxt('N_points.csv', unpack= True, delimiter='\t')
-
-        # coordinate_x_border = coordinate_x[:63]
-        # coordinate_y_border = coordinate_y[:63]
-        # coordinate_x_border = coordinate_x[:1]
-        # coordinate_y_border = coordinate_y[:1]
-
-        # coordinate_x_N = coordinate_x[63:]
-        # coordinate_y_N = coordinate_y[63:]
-        # coordinate_x_N = coordinate_x[1:10]
-        # coordinate_y_N = coordinate_y[1:10]
-
-        # print(coordinate_x_N)
-        # print(coordinate_y_N)
-        # print(coordinate_x_border)
-        # print(coordinate_y_border)
-        # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/circle_points_small.csv', unpack= True, delimiter=',')
-        # coordinate_x, coordinate_y = np.loadtxt('/home/demiana/Documents/me495_ros/workspaces/final_project/src/final-project-Group5/mattagascar/mattagascar/picture_points.csv', unpack= True, delimiter=',')
-
-        # coordinate_list_border = []
-        # self.brushlocs = {}
-
-        # for x, y in zip(coordinate_x_border, coordinate_y_border):
-        #     point = (x, y)
-        #     coordinate_list_border.append(point)
-
-        # self.waypoints_border = coordinate_list_border
-        # print("waypoints here", self.waypoints_border)
-
-        # coordinate_list_N = []
         self.brushlocs = {}
-
-        # for x, y in zip(coordinate_x_N, coordinate_y_N):
-        #     point = (x, y)
-        #     coordinate_list_N.append(point)
-
-        # self.waypoints_N = coordinate_list_N
-
-        # self.waypoints = []
-        # self.waypoints.append(self.waypoints_border)
-        # self.waypoints.append(self.waypoints_N)
-
-        # self.total_colors = len(self.waypoints)
-        # self.color_list = ['yellow', 'purple']
 
         self.current_color_idx = 0
         self.current_color = self.color_list[self.current_color_idx]
-        # self.current_color_idx = 0
 
         self.buffer = Buffer()
         self.listener = TransformListener(self.buffer, self)
         self.zoffset = 0.067
-        # varibles for z
+
         self.z_brush_standoff = 0.3 + self.zoffset + 0.1
         self.z_paint_standoff = 0.4 + self.zoffset
         self.z_brush_dot = 0.125 + .045 + 0.012  # 0.01
@@ -194,6 +125,8 @@ class ILikeToMoveItMoveIt(Node):
         self.pickup_loc.position.y = 0.244664
         self.pickup_loc.position.z = self.z_brush_standoff
         self.pickup_loc.orientation = self.orientation
+
+        self.point_count = 0
 
         # brush pickup location
         self.pickup_dip = Pose()
@@ -232,7 +165,7 @@ class ILikeToMoveItMoveIt(Node):
                 self.set_PaintLocs()
                 self.count_brush = 1
             except:
-                self.get_logger().info('Brush Locations Not Initlaized Yet')
+                self.get_logger().info('Brush Locations Not Initlaized Yet in April Tag Callback')
 
     def set_PaintLocs(self):
         try:
@@ -276,7 +209,7 @@ class ILikeToMoveItMoveIt(Node):
             if start == "s":
                 self.state = State.PICKUP
             else:
-                print("need to input a command to start")
+                self.get_logger().info("need to input a command to start")
 
         if self.state == State.TEST:
             try:
@@ -287,8 +220,8 @@ class ILikeToMoveItMoveIt(Node):
                 self.paintx = trans.transform.translation.x
                 self.painty = trans.transform.translation.y
                 self.paintz = trans.transform.translation.z
-                self.get_logger().info(
-                    f"Tag Location: {self.paintx,self.painty,self.paintz}")
+                # self.get_logger().info(
+                # f"Tag Location: {self.paintx,self.painty,self.paintz}")
 
             except tf2_ros.LookupException as e:
                 # the frames don't exist yet
@@ -296,48 +229,53 @@ class ILikeToMoveItMoveIt(Node):
 
         if self.state == State.PICKUP:
             # go to paint brush location and dip down
-
             # # this is the position of the paint pallete
             try:
                 # standoff pose
-                print("in the 1st try")
+                # print("in the 1st try")
                 self.get_logger().info(
-                    f'Current Color: {self.current_color}', once=True)
+                    f'Current Color PICKUP: {self.current_color}')
                 self.pickup_loc = Pose()
+                self.get_logger().info(
+                    f'BRUSH LOCATION: {self.brushlocs}')
                 self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
                 self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
                 self.pickup_loc.position.z = self.z_brush_standoff
                 self.pickup_loc.orientation = self.orientation
-                # self.get_logger().info(f'BRUSH LOCATION: {self.pickup_loc.position.x, self.pickup_loc.position.y}')
+                self.get_logger().info(
+                    f'BRUSH LOCATION: {self.pickup_loc.position.x, self.pickup_loc.position.y}')
 
                 self.pickup_dip = Pose()
                 self.pickup_dip.position.x = self.pickup_loc.position.x
                 self.pickup_dip.position.y = self.pickup_loc.position.y
+                self.get_logger().info(
+                    f'PICKUP DIP: {self.pickup_dip.position.x, self.pickup_dip.position.y}')
                 self.pickup_dip.position.z = self.z_brush_dip
                 self.pickup_dip.orientation = self.orientation
                 self.pick_msg_wpts = [self.pickup_loc, self.pickup_dip]
+                self.get_logger().info("Line before planner in PICKUP")
                 self.KingJulien.plan_path_cartesian(self.pick_msg_wpts)
 
                 self.state = State.PLANNING_GRIPPER
-                # self.state = State.DONE
+                # self.get_logger().info(f'BRUSH LOCATION: {self.pickup_loc.position.x, self.pickup_loc.position.y}')
+                # self.get_logger().info(f'BRUSH LOCATION: {self.pickup_loc.position.x, self.pickup_loc.position.y}')
 
             except:
-                self.get_logger().info('Brush Locations in timer Not Initlaized Yet')
+                self.get_logger().info('Brush Locations in timer not initialized yet in PICKUP')
 
         elif self.state == State.PLANNING_GRIPPER:
-            self.get_logger().info('IN PLANNING GRIPPER', once=True)
+            # self.get_logger().info('IN PLANNING GRIPPER', once=True)
             if self.KingJulien.state == self.Mort.EXECUTING:
-                self.get_logger().info('EXECUTING', once=True)
+                # self.get_logger().info('EXECUTING', once=True)
                 self.state = State.EXECUTING1
 
         elif self.state == State.EXECUTING1:
-            self.get_logger().info('Waiting for Execution to be done', once=True)
             if self.KingJulien.state == self.Mort.DONE:
                 self.state = State.GRIPPERCLOSE
 
         elif self.state == State.GRIPPERCLOSE:
-            self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPERCLOSING', once=True)
-            if self.con1 ==0:
+            self.get_logger().info('\n\tGripper Closing', once=True)
+            if self.con1 == 0:
                 self.grasp_close_goal = self.grasping.create_close_grasp_msg()
                 self.con1 = 1
             if self.grasping.state == self.Mort.CLOSE:
@@ -361,7 +299,7 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.UP
 
             except:
-                self.get_logger().info('Brush Locations in timer 2 Not Initlaized Yet')
+                self.get_logger().info('Brush Locations in state PICKBRUSH not found')
 
         elif self.state == State.UP:
             if self.KingJulien.state == self.Mort.EXECUTING:
@@ -372,29 +310,24 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.INITIALIZE
 
         elif self.state == State.INITIALIZE:
-            self.get_logger().info('IN INITIALIZE', once=True)
+            # self.get_logger().info('IN INITIALIZE', once=True)
             msg_waypoints = []
-            print("dude still in init")
 
             if not self.current_waypoints:
-                # return to paintbrush location to drop off at home
-                self.get_logger().info("self.waypoints is Empty")
+                self.get_logger().info("self.curent_waypoints is Empty")
                 self.home = input(
                     "Return paintbrush back and change color? (y/n): ")
                 # self.waypoints.pop(0)
                 self.state = State.DONE
 
             else:
-                print("got to else statement so not too bad")
                 if self.count % 5 == 0 or self.count == 0:
-                    print("am I in here?")
-                    # NOTE: needs paint
                     # Updating pallete location from the dictionary to the message we are sending.
                     self.set_PaintLocs()
                     msg_waypoints.append(self.paint_location_standoff)
                     msg_waypoints.append(self.paint_location_dip)
                     msg_waypoints.append(self.paint_location_standoff)
-                
+
                 standoff = Pose()
                 standoff.position.x = self.current_waypoints[0][0]
                 standoff.position.y = self.current_waypoints[0][1]
@@ -417,21 +350,11 @@ class ILikeToMoveItMoveIt(Node):
 
                 self.visited.append(self.waypoints[0])
                 self.current_waypoints.pop(0)
-                print("Got through this")
+                self.point_count += 1
+                self.get_logger().info(f"point count: {self.point_count}")
+                # self.get_logger().info(f"current color {self.current_color}")
 
-                # can do 15 points before needing to refill
-                # if self.count % 5 == 0 or self.count == 0:
-                #     print("am I in here?")
-                #     # NOTE: needs paint
-                #     # Updating pallete location from the dictionary to the message we are sending.
-                #     self.set_PaintLocs()
-                #     msg_waypoints.append(self.paint_location_standoff)
-                #     msg_waypoints.append(self.paint_location_dip)
-                #     msg_waypoints.append(self.paint_location_standoff)
-                print("msg_waypoints", msg_waypoints)
-                # from IPython import embed; embed()
                 self.KingJulien.plan_path_cartesian(msg_waypoints)
-                self.get_logger().info('Sent Waypoint msg, set state to EXECUTING', once=True)
                 self.state = State.PLANNING
 
         elif self.state == State.PLANNING:
@@ -439,7 +362,7 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.EXECUTING
 
         elif self.state == State.EXECUTING:
-            self.get_logger().info('Waiting for Execution to be done', once=True)
+            # self.get_logger().info('Waiting for Execution to be done', once=True)
             if self.KingJulien.state == self.Mort.DONE:
                 self.count += 1
                 self.state = State.INITIALIZE
@@ -447,7 +370,6 @@ class ILikeToMoveItMoveIt(Node):
         elif self.state == State.DONE:
             if self.home == 'y':
                 self.get_logger().info('DONE full painting', once=True)
-                # need to go back to paintbrush location
                 self.pickup_loc = Pose()
                 self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
                 self.pickup_loc.position.y = self.brushlocs[self.current_color][1]
@@ -467,49 +389,44 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.START
 
         elif self.state == State.PLANHOME:
-            self.get_logger().info('in planning back to paintbrush location', once=True)
+            # self.get_logger().info('in planning back to paintbrush location', once=True)
             if self.KingJulien.state == self.Mort.EXECUTING:
                 self.get_logger().info('EXECUTING', once=True)
                 self.state = State.EXECUTING2
 
         elif self.state == State.EXECUTING2:
-            self.get_logger().info('Waiting for Execution to be done for execute 2', once=True)
+            # self.get_logger().info('Waiting for Execution to be done for execute 2', once=True)
             if self.KingJulien.state == self.Mort.DONE:
-                self.get_logger().info("going to open the gripper")
+                # self.get_logger().info("going to open the gripper")
                 self.state = State.GRIPPEROPEN
 
         elif self.state == State.GRIPPEROPEN:
-            self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPEROPENING', once=True)
-            if self.con ==0:
-                self.get_logger().info('ABOUT TO SEND AN OPEN GRASP REQ', once=True)
+            # self.get_logger().info('\n\tNOTE: ILikeToMoveItMoveItGRIPPEROPENING', once=True)
+            if self.con == 0:
                 self.grasp_open_goal = self.grasping.create_open_grasp_msg()
-                self.get_logger().info('rRETURNED FROM OPEN REQUEST', once=True)
-
-                self.con =1
+                self.con = 1
             if self.grasping.state == self.Mort.OPEN:
                 # self.state = State.START
-                print("got to grasping and about to see if we can change colors")
                 if len(self.waypoints) != 0:
-                    self.get_logger().info("going to change color and then pack to pickup state")
+                    self.get_logger().info("Changing Color")
                     self.state = State.CHANGE_COLOR
                 else:
                     self.state = State.FINISHED
-                    self.get_logger().info("Going into finished state")
-                    finsihed = input("Enter f to finish: ")
+                    # finished = input("Enter f to finish: ")
 
         elif self.state == State.CHANGE_COLOR:
             self.current_color_idx += 1
-            # For chaning the gripper request queue
             self.con = 0
             self.con1 = 0
-            self.count = 0 # reset so when it gets 2nd color, it gets paint first before dotting
+            self.count = 0  # reset so when it gets 2nd color, it gets paint first before dotting
 
             self.current_color = self.color_list[self.current_color_idx]
+            # self.get_logger().info(
+            # f'Current Color: {self.current_color}', once=True)
             self.state = State.PICKUP
 
         elif self.state == State.FINISHED:
-            if finsihed == 'f':
-                self.get_logger().info("Robot Has Completed All Colors")
+            self.get_logger().info("Robot Has Completed All Colors")
 
 
 def main(args=None):

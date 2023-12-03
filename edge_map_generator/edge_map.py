@@ -7,18 +7,23 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+#SHAIL: 0.6, 0.5 
+
 # function to generate edge map
-def edge_map(image,skip_points):
-    # read in image file
+def edge_map(image,skip_points, scales):
+    
     img = cv2.imread(image, 0)
 
-    img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
+    img = cv2.resize(img, (0, 0), fx=scales[0],fy=scales[1])
 
-    # generate edge map
-    edges = cv2.Canny(img, 100, 200)
+    edges = cv2.Canny(image=img, 
+                      threshold1=100, 
+                      threshold2=200,
+                      apertureSize=3, L2gradient=True)
 
     # kernel = np.ones((4, 4), np.uint8)
     # edges = cv2.dilate(edges, kernel, iterations=1)
+    
 
     # invert the image
     edges = cv2.bitwise_not(edges)
@@ -122,38 +127,38 @@ def create_hexagon(center, diameter):
 def generate_circle_jsons(range):
     
     points = simple_circle(range) 
-    circle_points_alternating = {"purple": [], "yellow": []}
+    circle_points_alternating = {fill_color: [], border_color: []}
     for i, point in enumerate(points):
         if i % 2 == 0:
-            circle_points_alternating["purple"].append(point)
+            circle_points_alternating[fill_color].append(point)
         else:
-            circle_points_alternating["yellow"].append(point)
+            circle_points_alternating[border_color].append(point)
             
     save_to_json(circle_points_alternating, "color_switch_circle_pts.json")
     
     #plot the purple and yellow points 
     fig, ax = plt.subplots(figsize=(8, 6))
-    plt.plot(*zip(*circle_points_alternating["purple"]), marker='o', color='purple', ls='')
-    plt.plot(*zip(*circle_points_alternating["yellow"]), marker='o', color='yellow', ls='')
+    plt.plot(*zip(*circle_points_alternating[fill_color]), marker='o', color=fill_color, ls='')
+    plt.plot(*zip(*circle_points_alternating[border_color]), marker='o', color=border_color, ls='')
     plt.show()
     
     #make half of the points purple and half of the points yellow (NOT ALTERNATING)
-    circle_points_half = {"purple": [], "yellow": []}
+    circle_points_half = {fill_color: [], border_color: []}
 
     for i,point in enumerate(points):
         if i < len(points) / 2:
-            circle_points_half["purple"].append(point)
+            circle_points_half[fill_color].append(point)
         else:
-            circle_points_half["yellow"].append(point)
+            circle_points_half[border_color].append(point)
 
     fig, ax = plt.subplots(figsize=(8, 6))
-    plt.plot(*zip(*circle_points_half["purple"]), marker='o', color='purple', ls='')
-    plt.plot(*zip(*circle_points_half["yellow"]), marker='o', color='yellow', ls='')
+    plt.plot(*zip(*circle_points_half[fill_color]), marker='o', color=fill_color, ls='')
+    plt.plot(*zip(*circle_points_half[border_color]), marker='o', color=border_color, ls='')
     plt.show()
     save_to_json(circle_points_alternating, "circle_half_and_half.json")
     
-def make_college_logo(img_filename, json_filename, skip_points, range): 
-    edges, points = edge_map(img_filename,skip_points)
+def make_college_logo(img_filename, json_filename, skip_points, range, scales, border_color, fill_color): 
+    edges, points = edge_map(img_filename,skip_points,scales)
 
     x_range, y_range = range
     mapped_points = map_points_to_range(points, x_range, y_range) 
@@ -162,8 +167,8 @@ def make_college_logo(img_filename, json_filename, skip_points, range):
     print("Number of points: ", len(mapped_points))
 
     points_dict = {} 
-    points_dict["purple"] = inner_points
-    points_dict["yellow"] = border_points
+    points_dict[border_color] = border_points
+    points_dict[fill_color] = inner_points
 
     fig, ax = plt.subplots(figsize=(8, 6))
     plt.xlim(x_range)
@@ -171,12 +176,12 @@ def make_college_logo(img_filename, json_filename, skip_points, range):
     
     # Plotting circles for inner points
     for x, y in inner_points:
-        circle = patches.Circle((x, y), 0.02 / 2, color='red', fill=True)  # Diameter 0.025 meters
+        circle = patches.Circle((x, y), 0.02 / 2, color=fill_color, fill=True)  # Diameter 0.025 meters
         ax.add_patch(circle)
 
     # Plotting circles for border points
     for x, y in border_points:
-        circle = patches.Circle((x, y), 0.02 / 2, color='yellow', fill=True)  # Diameter 0.025 meters
+        circle = patches.Circle((x, y), 0.02 / 2, color=border_color, fill=True)  # Diameter 0.025 meters
         ax.add_patch(circle)
 
     ax.set_aspect('equal', adjustable='datalim')
@@ -188,44 +193,84 @@ def make_college_logo(img_filename, json_filename, skip_points, range):
     
     save_to_json(points_dict, json_filename)
 
+#green red yellow purple blue orange
 
 def main():
-
+    # x_range = (-0.2538, 0.1996)
+    # y_range = (0.4788, 0.73217)
+    
     knoxville_range = ((-0.2538, 0.0), 
                        (0.4788, 0.73217))
     
     notre_dame_range = ((-0.2538, 0.17),
                         (0.4788, 0.73217))
     
+    
     maryland_range = ((-0.2538, 0.17),
                       (0.4788, 0.73217))
+    
+    
+    make_college_logo(img_filename="notre_dame_2.png", 
+                     json_filename="notre_dame.json", 
+                     skip_points=20,
+                     range=notre_dame_range,
+                     scales=(0.65, 0.65),
+                     border_color="yellow",
+                     fill_color="blue")
     
     make_college_logo(img_filename="knoxville.png", 
                      json_filename="knoxville.json", 
                      skip_points=100,
-                     range=knoxville_range)
+                     range=knoxville_range,
+                     scales=(0.6, 0.6),
+                     border_color="orange",
+                     fill_color="orange")
     
-    make_college_logo(img_filename="notre_dame.jpg", 
-                     json_filename="notre_dame.json", 
-                     skip_points=13,
-                     range=notre_dame_range)
 
     make_college_logo(img_filename="maryland.png", 
                      json_filename="maryland.json", 
-                     skip_points=80,
-                     range=maryland_range)
+                     skip_points=50,
+                     range=maryland_range,
+                     scales=(0.6, 0.5),
+                     border_color="yellow",
+                     fill_color="red")
     
+    make_college_logo(img_filename="S.png", 
+                        json_filename="swarthmore.json", 
+                        skip_points=20,
+                        range=knoxville_range,
+                        scales=(0.3, 0.3),
+                        border_color="orange",
+                        fill_color="red")
+    
+    make_college_logo(img_filename="gtech.png", 
+                    json_filename="gtech_yellow.json", 
+                    skip_points=13,
+                    range=notre_dame_range,
+                    scales=(0.6, 0.6),
+                    border_color="blue",
+                    fill_color="yellow")
+    
+    make_college_logo(img_filename="gtech.png", 
+                    json_filename="gtech_blue.json", 
+                    skip_points=13,
+                    range=notre_dame_range,
+                    scales=(0.6, 0.6),
+                    border_color="yellow",
+                    fill_color="blue")
 
-    circle_range = ((-0.2538, 0.17), #xrange
-                    (0.4788, 0.73217)) #yrange
-    generate_circle_jsons(circle_range)
+
+
+    # circle_range = ((-0.2538, 0.17), #xrange
+    #                 (0.4788, 0.73217)) #yrange
+    # generate_circle_jsons(circle_range)
     
     
     # # save_to_csv(mapped_points, "N_points.csv")
     # with open('notre_dame_points.json', 'w') as fp:
     #     json.dump(points_dict, fp)
-    # # save_to_csv(points_dict["purple"], "N_purple_points.csv")
-    # # save_to_csv(points_dict["yellow"], "N_yellow_points.csv")
+    # # save_to_csv(points_dict[fill_color], "N_purple_points.csv")
+    # # save_to_csv(points_dict[border_color], "N_yellow_points.csv")
 
 if __name__ == "__main__":
     main()
