@@ -35,11 +35,18 @@ class ImageListener(Node):
         self.cy_purple = None
         self.cx_yellow = None
         self.cy_yellow = None
+        self.cx_red = None
+        self.cy_red = None
+        self.cx_blue = None
+        self.cy_blue = None
         self.cx_green = None
         self.cy_green = None
+        self.cx_orange = None
+        self.cy_orange = None
+
 
         self.intrinsics = None
-        cv2.namedWindow('trackbar', cv2.WINDOW_NORMAL)
+        # cv2.namedWindow('trackbar', cv2.WINDOW_NORMAL)
         # cv2.createTrackbar('LowH_purple','trackbar',0,179,self.nothing)
         # cv2.createTrackbar('HighH_purple','trackbar',0,179,self.nothing)
         # cv2.createTrackbar('LowS_purple','trackbar',0,255,self.nothing)
@@ -47,19 +54,41 @@ class ImageListener(Node):
         # cv2.createTrackbar('LowV_purple','trackbar',0,255,self.nothing)
         # cv2.createTrackbar('HighV_purple','trackbar',0,255,self.nothing)
 
-        cv2.createTrackbar('LowH_yellow', 'trackbar', 0, 179, self.nothing)
-        cv2.createTrackbar('HighH_yellow', 'trackbar', 0, 179, self.nothing)
-        cv2.createTrackbar('LowS_yellow', 'trackbar', 0, 255, self.nothing)
-        cv2.createTrackbar('HighS_yellow', 'trackbar', 0, 255, self.nothing)
-        cv2.createTrackbar('LowV_yellow', 'trackbar', 0, 255, self.nothing)
-        cv2.createTrackbar('HighV_yellow', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('LowH_yellow', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('HighH_yellow', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('LowS_yellow', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighS_yellow', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('LowV_yellow', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighV_yellow', 'trackbar', 0, 255, self.nothing)
 
-        cv2.createTrackbar('LowH_green', 'trackbar', 0, 179, self.nothing)
-        cv2.createTrackbar('HighH_green', 'trackbar', 0, 179, self.nothing)
-        cv2.createTrackbar('LowS_green', 'trackbar', 0, 255, self.nothing)
-        cv2.createTrackbar('HighS_green', 'trackbar', 0, 255, self.nothing)
-        cv2.createTrackbar('LowV_green', 'trackbar', 0, 255, self.nothing)
-        cv2.createTrackbar('HighV_green', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('LowH_red', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('HighH_red', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('LowS_red', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighS_red', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('LowV_red', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighV_red', 'trackbar', 0, 255, self.nothing)
+
+        # cv2.createTrackbar('LowH_blue', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('HighH_blue', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('LowS_blue', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighS_blue', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('LowV_blue', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighV_blue', 'trackbar', 0, 255, self.nothing)
+
+        # cv2.createTrackbar('LowH_green', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('HighH_green', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('LowS_green', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighS_green', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('LowV_green', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighV_green', 'trackbar', 0, 255, self.nothing)
+
+        # cv2.createTrackbar('LowH_orange', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('HighH_orange', 'trackbar', 0, 179, self.nothing)
+        # cv2.createTrackbar('LowS_orange', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighS_orange', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('LowV_orange', 'trackbar', 0, 255, self.nothing)
+        # cv2.createTrackbar('HighV_orange', 'trackbar', 0, 255, self.nothing)
+
 
     def camera_info_cb(self, msg):
         value = msg.k
@@ -139,10 +168,10 @@ class ImageListener(Node):
         upper_purple = np.array([149, 149, 165], np.uint8)
         purple_mask = cv2.inRange(hsv, lower_purple, upper_purple)
 
-        lower_yellow = np.array([cv2.getTrackbarPos('LowH_yellow', 'trackbar'), cv2.getTrackbarPos(
-            'LowS_yellow', 'trackbar'), cv2.getTrackbarPos('LowV_yellow', 'trackbar')])
-        upper_yellow = np.array([cv2.getTrackbarPos('HighH_yellow', 'trackbar'), cv2.getTrackbarPos(
-            'HighS_yellow', 'trackbar'), cv2.getTrackbarPos('HighV_yellow', 'trackbar')])
+        # lower_yellow = np.array([cv2.getTrackbarPos('LowH_yellow', 'trackbar'), cv2.getTrackbarPos(
+        #     'LowS_yellow', 'trackbar'), cv2.getTrackbarPos('LowV_yellow', 'trackbar')])
+        # upper_yellow = np.array([cv2.getTrackbarPos('HighH_yellow', 'trackbar'), cv2.getTrackbarPos(
+        #     'HighS_yellow', 'trackbar'), cv2.getTrackbarPos('HighV_yellow', 'trackbar')])
 
         lower_yellow = np.array([6, 101, 163], np.uint8)
         upper_yellow = np.array([42, 170, 255], np.uint8)
@@ -151,14 +180,44 @@ class ImageListener(Node):
         # upper_yellow = np.array([180, 255, 255], np.uint8)
         yellow_mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
-        lower_green = np.array([cv2.getTrackbarPos('LowH_green', 'trackbar'), cv2.getTrackbarPos(
-            'LowS_green', 'trackbar'), cv2.getTrackbarPos('LowV_green', 'trackbar')])
-        upper_green = np.array([cv2.getTrackbarPos('HighH_green', 'trackbar'), cv2.getTrackbarPos(
-            'HighS_green', 'trackbar'), cv2.getTrackbarPos('HighV_green', 'trackbar')])
+        # lower_red = np.array([cv2.getTrackbarPos('LowH_red', 'trackbar'), cv2.getTrackbarPos(
+        #     'LowS_red', 'trackbar'), cv2.getTrackbarPos('LowV_red', 'trackbar')])
+        # upper_red = np.array([cv2.getTrackbarPos('HighH_red', 'trackbar'), cv2.getTrackbarPos(
+        #     'HighS_red', 'trackbar'), cv2.getTrackbarPos('HighV_red', 'trackbar')])
 
-        # lower_green = np.array([25, 52, 72], np.uint8)
-        # upper_green = np.array([102, 255, 255], np.uint8)
+        lower_red = np.array([113, 114, 155], np.uint8)
+        upper_red = np.array([179, 163, 200], np.uint8)
+
+        red_mask = cv2.inRange(hsv, lower_red, upper_red)
+
+        # lower_blue = np.array([cv2.getTrackbarPos('LowH_blue', 'trackbar'), cv2.getTrackbarPos(
+        #     'LowS_blue', 'trackbar'), cv2.getTrackbarPos('LowV_blue', 'trackbar')])
+        # upper_blue = np.array([cv2.getTrackbarPos('HighH_blue', 'trackbar'), cv2.getTrackbarPos(
+        #     'HighS_blue', 'trackbar'), cv2.getTrackbarPos('HighV_blue', 'trackbar')])
+
+        lower_blue = np.array([100, 68, 101], np.uint8)
+        upper_blue = np.array([117, 110, 167], np.uint8)
+
+        blue_mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+        # lower_green = np.array([cv2.getTrackbarPos('LowH_green', 'trackbar'), cv2.getTrackbarPos(
+        #     'LowS_green', 'trackbar'), cv2.getTrackbarPos('LowV_green', 'trackbar')])
+        # upper_green = np.array([cv2.getTrackbarPos('HighH_green', 'trackbar'), cv2.getTrackbarPos(
+        #     'HighS_green', 'trackbar'), cv2.getTrackbarPos('HighV_green', 'trackbar')])
+        lower_green = np.array([49, 33, 97], np.uint8)
+        upper_green = np.array([94, 103, 188], np.uint8)
+
         green_mask = cv2.inRange(hsv, lower_green, upper_green)
+
+        # lower_orange = np.array([cv2.getTrackbarPos('LowH_orange', 'trackbar'), cv2.getTrackbarPos(
+        #     'LowS_orange', 'trackbar'), cv2.getTrackbarPos('LowV_orange', 'trackbar')])
+        # upper_orange = np.array([cv2.getTrackbarPos('HighH_orange', 'trackbar'), cv2.getTrackbarPos(
+        #     'HighS_orange', 'trackbar'), cv2.getTrackbarPos('HighV_orange', 'trackbar')])
+        lower_orange = np.array([0, 54, 181], np.uint8)
+        upper_orange = np.array([14, 168, 255], np.uint8)
+
+        orange_mask = cv2.inRange(hsv, lower_orange, upper_orange)
+
 
         kernel_size = (5, 5)
         kernelo = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_size)
@@ -166,15 +225,21 @@ class ImageListener(Node):
         kernelc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_sizec)
         img_open = cv2.morphologyEx(purple_mask, cv2.MORPH_OPEN, kernelo)
         img_open1 = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernelo)
-        img_open2 = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernelo)
+        img_open2 = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernelo)
+        img_open3 = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernelo)
         img_close_purple = cv2.morphologyEx(img_open, cv2.MORPH_CLOSE, kernelc)
         img_close_yellow = cv2.morphologyEx(
             img_open1, cv2.MORPH_CLOSE, kernelc)
-        img_close_green = cv2.morphologyEx(img_open2, cv2.MORPH_CLOSE, kernelc)
+        img_close_red = cv2.morphologyEx(img_open2, cv2.MORPH_CLOSE, kernelc)
+        img_close_blue = cv2.morphologyEx(img_open3, cv2.MORPH_CLOSE, kernelc)
 
         res_purple = cv2.bitwise_and(masked, masked, mask=img_close_purple)
         res_yellow = cv2.bitwise_and(masked, masked, mask=img_close_yellow)
-        res_green = cv2.bitwise_and(masked, masked, mask=img_close_green)
+        res_red = cv2.bitwise_and(masked, masked, mask=img_close_red)
+        res_blue = cv2.bitwise_and(masked, masked, mask=img_close_blue)
+        res_green = cv2.bitwise_and(masked, masked, mask=green_mask)
+        res_orange = cv2.bitwise_and(masked, masked, mask=orange_mask)
+
         contours, hierarchy = cv2.findContours(
             img_close_purple, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # print(len(contours))
@@ -216,7 +281,47 @@ class ImageListener(Node):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         contours, hierarchy = cv2.findContours(
-            img_close_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            img_close_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # print(len(contours))
+
+        biggest_contour = 0
+        if len(contours) > 0:
+            biggest_contour = contours[0]
+            for a in range(0, len(contours)):
+                if cv2.contourArea(contours[a]) > cv2.contourArea(biggest_contour):
+                    biggest_contour = contours[a]
+
+            M = cv2.moments(biggest_contour)
+            self.cx_red = int(M['m10']/M['m00'])
+            self.cy_red = int(M['m01']/M['m00'])
+
+            cv2.circle(masked, (self.cx_red, self.cy_red),
+                       3, (255, 255, 255), -1)
+            cv2.putText(masked, 'red_centroid', (self.cx_red-10, self.cy_red-10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            
+        contours, hierarchy = cv2.findContours(
+            img_close_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
+        # print(len(contours))
+
+        biggest_contour = 0
+        if len(contours) > 0:
+            biggest_contour = contours[0]
+            for a in range(0, len(contours)):
+                if cv2.contourArea(contours[a]) > cv2.contourArea(biggest_contour):
+                    biggest_contour = contours[a]
+
+            M = cv2.moments(biggest_contour)
+            self.cx_blue = int(M['m10']/M['m00'])
+            self.cy_blue = int(M['m01']/M['m00'])
+
+            cv2.circle(masked, (self.cx_blue, self.cy_blue),
+                       3, (255, 255, 255), -1)
+            cv2.putText(masked, 'blue_centroid', (self.cx_blue-10, self.cy_blue-10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            
+        contours, hierarchy = cv2.findContours(
+            green_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # print(len(contours))
 
         biggest_contour = 0
@@ -234,23 +339,53 @@ class ImageListener(Node):
                        3, (255, 255, 255), -1)
             cv2.putText(masked, 'green_centroid', (self.cx_green-10, self.cy_green-10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        
 
+        contours, hierarchy = cv2.findContours(
+            orange_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # print(len(contours))
+
+        biggest_contour = 0
+        if len(contours) > 0:
+            biggest_contour = contours[0]
+            for a in range(0, len(contours)):
+                if cv2.contourArea(contours[a]) > cv2.contourArea(biggest_contour):
+                    biggest_contour = contours[a]
+
+            M = cv2.moments(biggest_contour)
+            self.cx_orange = int(M['m10']/M['m00'])
+            self.cy_orange = int(M['m01']/M['m00'])
+
+            cv2.circle(masked, (self.cx_orange, self.cy_orange),
+                       3, (255, 255, 255), -1)
+            cv2.putText(masked, 'orange_centroid', (self.cx_orange-10, self.cy_orange-10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            
         conto = cv2.drawContours(masked, contours, -1, (0, 255, 0), 3)
 
         # cv2.imshow('Thresh', conto)
         # cv2.setMouseCallback('Thresh', self.click_event)
 
-        # cv2.namedWindow('purple', cv2.WINDOW_NORMAL)
-        # cv2.imshow('purple',img_close_purple)
+        # # cv2.namedWindow('purple', cv2.WINDOW_NORMAL)
+        # # cv2.imshow('purple',img_close_purple)
 
-        # cv2.namedWindow('yellow', cv2.WINDOW_NORMAL)
-        # cv2.imshow('yellow', img_close_yellow)
+        # # cv2.namedWindow('yellow', cv2.WINDOW_NORMAL)
+        # # cv2.imshow('yellow', img_close_yellow)
+
+        # cv2.namedWindow('red', cv2.WINDOW_NORMAL)
+        # cv2.imshow('red',img_close_red)
+
+        # cv2.namedWindow('blue', cv2.WINDOW_NORMAL)
+        # cv2.imshow('blue',img_close_blue)
 
         # cv2.namedWindow('green', cv2.WINDOW_NORMAL)
-        # cv2.imshow('green',img_close_green)
+        # cv2.imshow('green',green_mask)
+
+        # cv2.namedWindow('orange', cv2.WINDOW_NORMAL)
+        # cv2.imshow('orange',orange_mask)
 
         # cv2.waitKey(1)
-        # self.get_logger().info(f"finish? {cx_purple, cx_green, cx_yellow}")
+        # self.get_logger().info(f"finish? {cx_purple, cx_red, cx_yellow}")
 
     def broadcaster(self, tagpos):
         depth = tagpos[2]
@@ -292,24 +427,81 @@ class ImageListener(Node):
 
             self.tf_broadcaster.sendTransform(b)
 
-        if self.cx_green is not None and self.cy_green is not None:
-            green_pos = rs2.rs2_deproject_pixel_to_point(
-                self.intrinsics, [self.cx_green, self.cy_green], depth)
+        if self.cx_red is not None and self.cy_red is not None:
+            red_pos = rs2.rs2_deproject_pixel_to_point(
+                self.intrinsics, [self.cx_red, self.cy_red], depth)
             g = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             g.header.stamp = self.get_clock().now().to_msg()
             g.header.frame_id = 'camera_color_optical_frame'
-            g.child_frame_id = 'green_color'
+            g.child_frame_id = 'red_color'
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
-            g.transform.translation.x = green_pos[0]
-            g.transform.translation.y = green_pos[1]
-            g.transform.translation.z = green_pos[2]
+            g.transform.translation.x = red_pos[0]
+            g.transform.translation.y = red_pos[1]
+            g.transform.translation.z = red_pos[2]
 
             self.tf_broadcaster.sendTransform(g)
+        
+        if self.cx_blue is not None and self.cy_blue is not None:
+            blue_pos = rs2.rs2_deproject_pixel_to_point(
+                self.intrinsics, [self.cx_blue, self.cy_blue], depth)
+            y = TransformStamped()
+
+            # Read message content and assign it to
+            # corresponding tf variables
+            y.header.stamp = self.get_clock().now().to_msg()
+            y.header.frame_id = 'camera_color_optical_frame'
+            y.child_frame_id = 'blue_color'
+
+            # Turtle only exists in 2D, thus we get x and y translation
+            # coordinates from the message and set the z coordinate to 0
+            y.transform.translation.x = blue_pos[0]
+            y.transform.translation.y = blue_pos[1]
+            y.transform.translation.z = blue_pos[2]
+
+            self.tf_broadcaster.sendTransform(y)
+        
+        if self.cx_green is not None and self.cy_green is not None:
+            green_pos = rs2.rs2_deproject_pixel_to_point(
+                self.intrinsics, [self.cx_green, self.cy_green], depth)
+            o = TransformStamped()
+
+            # Read message content and assign it to
+            # corresponding tf variables
+            o.header.stamp = self.get_clock().now().to_msg()
+            o.header.frame_id = 'camera_color_optical_frame'
+            o.child_frame_id = 'green_color'
+
+            # Turtle only exists in 2D, thus we get x and y translation
+            # coordinates from the message and set the z coordinate to 0
+            o.transform.translation.x = green_pos[0]
+            o.transform.translation.y = green_pos[1]
+            o.transform.translation.z = green_pos[2]
+
+            self.tf_broadcaster.sendTransform(o)
+        
+        if self.cx_orange is not None and self.cy_orange is not None:
+            orange_pos = rs2.rs2_deproject_pixel_to_point(
+                self.intrinsics, [self.cx_orange, self.cy_orange], depth)
+            p = TransformStamped()
+
+            # Read message content and assign it to
+            # corresponding tf variables
+            p.header.stamp = self.get_clock().now().to_msg()
+            p.header.frame_id = 'camera_color_optical_frame'
+            p.child_frame_id = 'orange_color'
+
+            # Turtle only exists in 2D, thus we get x and y translation
+            # coordinates from the message and set the z coordinate to 0
+            p.transform.translation.x = orange_pos[0]
+            p.transform.translation.y = orange_pos[1]
+            p.transform.translation.z = orange_pos[2]
+
+            self.tf_broadcaster.sendTransform(p)
 
     def timer_callback(self):
         try:

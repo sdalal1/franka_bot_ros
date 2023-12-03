@@ -94,8 +94,10 @@ class ILikeToMoveItMoveIt(Node):
         # coordinate_x_N, coordinate_y_N = pd.read_csv('N_points.csv', sep='\t', header=None).iloc[:, 63:].values.tolist()
 
         # Opening JSON file
-        f = open('color_switch_circle_pts.json')
-        # returns JSON object as 
+        # f = open('color_switch_circle_pts.json')
+        file_name = 'N_points.json'
+        f = open(file_name)
+        # returns JSON object as
         # a dictionary
         image = json.load(f)
         self.color_list = list(image.keys())
@@ -105,8 +107,7 @@ class ILikeToMoveItMoveIt(Node):
             points  = image[color]
             self.waypoints.append(points)
 
-        print(f'waypoints: {self.waypoints}')   
-        print(f'shape of waypoints: {len(self.waypoints[0]), len(self.waypoints[0][0])}') 
+        print(f"loaded in {file_name}")
         f.close()
 
         # coordinate_x, coordinate_y = np.loadtxt(
@@ -168,7 +169,7 @@ class ILikeToMoveItMoveIt(Node):
         self.z_paint_standoff = 0.4 + self.zoffset
         self.z_brush_dot = 0.125 + .045 + 0.012  # 0.01
         self.z_paint_dip = 0.14 + .055
-        self.z_brush_dip = 0.16 + self.zoffset + 0.010  # 0.012
+        self.z_brush_dip = 0.16 + self.zoffset + 0.011  # 0.012
         self.z_dot_standoff = 0.25
 
         # # paint standoff location
