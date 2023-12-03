@@ -75,7 +75,7 @@ class ILikeToMoveItMoveIt(Node):
         self.apriltagsub = self.create_subscription(
             Loc, "paint_loc", self.apriltagloc_cb, 10)
 
-        file_name = 'maryland.json'
+        file_name = 'swarthmore.json'
         f = open(file_name)
         image = json.load(f)
         self.color_list = list(image.keys())
@@ -85,7 +85,8 @@ class ILikeToMoveItMoveIt(Node):
             points = image[color]
             self.waypoints.append(points)
 
-        # self.waypoints[0] = self.waypoints[0][-1:]
+        # self.waypoints[0] = self.waypoints[0][:]
+        # self.waypoints[1] = self.waypoints[1][183:]
         f.close()
         self.brushlocs = {}
 
