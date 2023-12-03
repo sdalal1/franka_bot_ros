@@ -223,10 +223,11 @@ class ILikeToMoveItMoveIt(Node):
             try:
                 self.brushlocs["purple"] = msg.purple
                 self.brushlocs["yellow"] = msg.yellow
-
+                self.brushlocs["red"] = msg.red
                 self.brushlocs["blue"] = msg.blue
                 self.brushlocs["green"] = msg.green
                 self.brushlocs["orange"] = msg.orange
+
                 self.brushlocs["palete"] = msg.palete
                 self.set_PaintLocs()
                 self.count_brush = 1
