@@ -75,7 +75,7 @@ class ILikeToMoveItMoveIt(Node):
         self.apriltagsub = self.create_subscription(
             Loc, "paint_loc", self.apriltagloc_cb, 10)
 
-        file_name = 'swarthmore.json'
+        file_name = 'notre_dame.json'
         f = open(file_name)
         image = json.load(f)
         self.color_list = list(image.keys())
@@ -322,7 +322,7 @@ class ILikeToMoveItMoveIt(Node):
                 self.state = State.DONE
 
             else:
-                if self.count % 5 == 0 or self.count == 0:
+                if self.count % 8 == 0 or self.count == 0:
                     # Updating pallete location from the dictionary to the message we are sending.
                     self.set_PaintLocs()
                     msg_waypoints.append(self.paint_location_standoff)
