@@ -85,8 +85,8 @@ class ILikeToMoveItMoveIt(Node):
             points = image[color]
             self.waypoints.append(points)
 
-        # self.waypoints[0] = self.waypoints[0][:]
-        # self.waypoints[1] = self.waypoints[1][183:]
+        # self.waypoints[0] = self.waypoints[0][:1]
+        # self.waypoints[1] = self.waypoints[1][214:]
         f.close()
         self.brushlocs = {}
 
