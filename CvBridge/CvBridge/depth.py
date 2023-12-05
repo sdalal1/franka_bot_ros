@@ -375,7 +375,7 @@ class ImageListener(Node):
 
         conto = cv2.drawContours(masked, contours, -1, (0, 255, 0), 3)
 
-        cv2.imshow('Thresh', conto)
+        # cv2.imshow('Thresh', conto)
         # cv2.setMouseCallback('Thresh', self.click_event)
 
         # # cv2.namedWindow('purple', cv2.WINDOW_NORMAL)

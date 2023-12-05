@@ -106,7 +106,7 @@ class listener(Node):
                 paint.blue = [self.robot_to_brush[0] + self.brush1_tag_offset_x,
                              self.robot_to_brush[1] + self.brush_tag_offset_y, self.robot_to_brush[2]]
                 # paint.orange = [paint.red[0], paint.red[1] + self.bw_brush_inc_y, paint.red[2]]
-                paint.yellow = [self.robot_to_brush[0] + self.brush2_tag_offset_x,
+                paint.red = [self.robot_to_brush[0] + self.brush2_tag_offset_x,
                                 self.robot_to_brush[1] + self.brush_tag_offset_y, self.robot_to_brush[2]]
                 # paint.green = [paint.yellow[0], paint.yellow[1] + self.bw_brush_inc_y, paint.yellow[2]]
                 # paint.blue = [paint.green[0], paint.green[1] + self.bw_brush_inc_y, paint.green[2]]
