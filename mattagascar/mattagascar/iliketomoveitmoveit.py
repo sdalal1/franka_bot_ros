@@ -131,7 +131,7 @@ class ILikeToMoveItMoveIt(Node):
         self.count_brush = 0
 
     def apriltagloc_cb(self, msg: Loc):
-        # message type for the paint brush locations
+        """Get position of the paint brushes."""
         if self.count_brush == 0:
             try:
                 self.brushlocs["purple"] = msg.purple
@@ -144,12 +144,13 @@ class ILikeToMoveItMoveIt(Node):
                 self.brushlocs["palete"] = msg.palete
                 self.set_PaintLocs()
                 self.count_brush = 1
-            except:
+            except Exception:
                 self.get_logger().info(
                     "Brush Locations Not Initlaized Yet in April Tag Callback"
                 )
 
     def set_PaintLocs(self):
+        """Get position of current paint color."""
         try:
             # get the latest transform between left and right
             trans = self.buffer.lookup_transform(
@@ -182,7 +183,7 @@ class ILikeToMoveItMoveIt(Node):
             start = input("Enter s to begin: ")
             try:
                 self.set_PaintLocs()
-            except:
+            except Exception:
                 pass
 
             if start == "s":
@@ -234,7 +235,7 @@ class ILikeToMoveItMoveIt(Node):
 
                 self.state = State.PLANNING_GRIPPER
 
-            except:
+            except Exception:
                 self.get_logger().info(
                     "Brush Locations in timer not initialized yet in PICKUP"
                 )
@@ -261,7 +262,7 @@ class ILikeToMoveItMoveIt(Node):
                 self.KingJulien.plan_path_cartesian([self.pickup_loc])
                 self.state = State.UP
 
-            except:
+            except Exception:
                 self.get_logger().info("Brush Locations in state PICKBRUSH not found")
 
         elif self.state == State.UP:

@@ -186,7 +186,7 @@ class Wrapper:
         future.add_done_callback(self.goal_path_cb)
 
     def future_cartesian_cb(self, future):
-        """Execute RobotState msg and Robot Trajectory msg"""
+        """Execute RobotState msg and Robot Trajectory msg."""
         robot_traj = future.result().solution
         frac = future.result().fraction
         print("fraction", frac)
@@ -255,9 +255,7 @@ class Wrapper:
         self.state = FRANKA.DONE
 
     def plan_path_cartesian(self, waypoints):
-        """
-        Cartesian path by specifying a list of waypoints for the end-effector to go through.
-        """
+        """Cartesian path by specifying a list of waypoints for the end-effector to go through."""
         frame_id = "panda_link0"
         start_state = [0.30724, 0.00054, 0.59104]
 
