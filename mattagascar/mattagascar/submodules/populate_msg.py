@@ -16,7 +16,7 @@ from moveit_msgs.msg import (JointConstraint, TrajectoryConstraints,
                              PlanningOptions, RobotState,
                              AllowedCollisionMatrix, PlanningSceneWorld,
                              MotionPlanRequest, WorkspaceParameters,
-                             PositionIKRequest, RobotTrajectory, CartesianTrajectory, CartesianTrajectoryPoint, CartesianPoint)
+                             PositionIKRequest, RobotTrajectory, CartesianPoint)
 from octomap_msgs.msg import OctomapWithPose, Octomap
 from enum import Enum, auto
 from trajectory_msgs.msg import JointTrajectory
@@ -48,78 +48,25 @@ class PopulateMsgs():
         self.state = State.NEUTRAL
         self.node = node
 
-    # def set_CartesianTrajectoryMsgs(self, waypoints, orientations, dT, frame_id):
-    #     ct_msg = CartesianTrajectory()
-    #     points = []
-    #     ct_msg.header.stamp = self.node.get_clock().now().to_msg()
-    #     ct_msg.header.frame = frame_id
-
-    #     for p, o, dt in zip(waypoints, orientations, dT):
-    #         points.append(self.set_CartesianTrajectoryPoint(p,o, dt))
-
-    #     ct_msg.points = points
-    #     ct_msg.tracked_frame = frame_id
-    #     return ct_msg
-
-    # def set_CartesianTrajectoryPoint(self, position, orientation, dt):
-    #     ctp_msg = CartesianTrajectory()
-    #     ctp_msg.point = self.set_CartesianPoint(position, orientation)
-    #     dt = Duration()
-    #     ctp_msg.time_from_start = dt
-    #     return ctp_msg
-
-    # def set_CartesianPoint(self, position, orientation):
-    #     cp_msg = CartesianPoint()
-    #     cp_msg.pose = self.set_PoseMsgs(position, orientation)
-    #     return cp_msg
-
-    # max_step, jump_threshold):
     def set_GetCartesianPositionRqt(self, group_name, frame_id, position, joint_names, waypoints):
         cart_pos_rqst = GetCartesianPath.Request()
         cart_pos_rqst.header.stamp = self.node.get_clock().now().to_msg()
         cart_pos_rqst.header.frame_id = frame_id
 
-        # cart_pos_rqst.start_state = self.set_RobotState(frame_id, joint_names, position)
         cart_pos_rqst.group_name = group_name
-        # weird: ask Matt why this is the case for it to work with either links
         cart_pos_rqst.link_name = 'panda_link8'
-        # cart_pos_rqst.link_name = 'panda_hand_tcp'
         cart_pos_rqst.waypoints = waypoints  # this must be a list of Pose() msgs
         max_step = 0.05
-        # not setting these will cause the motion to be fastttttt!
         cart_pos_rqst.max_velocity_scaling_factor = 0.05
         cart_pos_rqst.max_acceleration_scaling_factor = 0.05
         cart_pos_rqst.max_cartesian_speed = 0.05
-        # cart_pos_rqst.cartesian_speed_limited_link = 'panda_hand_tcp'
         cart_pos_rqst.cartesian_speed_limited_link = 'panda_link8'
         cart_pos_rqst.max_step = max_step
-        # cart_pos_rqst.jump_threshold = jump_threshold
         return cart_pos_rqst
-
-    # def set_CartesianTrajectoryMsgs(self, waypoints, dT, frame_id):
-    #     ct_msg = CartesianTrajectory()
-    #     ct_msg.header.stamp = self.node.get_clock().now().to_msg()
-    #     wypts = []
-    #     # wypts.append(self.set_CartesianTrajectoryPoint(waypoints, dT))
-    #     for p, dt in zip(waypoints, dT):
-    #         wypts.append(self.set_CartesianTrajectoryPoint(p, dt))
-
-    #     ct_msg.points = wypts
-    #     ct_msg.tracked_frame = frame_id
-    #     return ct_msg
-
-    # def set_CartesianTrajectoryPoint(self, position, dt):
-    #     ctp_msg = CartesianTrajectoryPoint()
-    #     ctp_msg.point = self.set_CartesianPoint(position)
-    #     dt_msg = Duration()
-    #     dt_msg.sec = dt
-    #     ctp_msg.time_from_start = dt_msg
-    #     return ctp_msg
 
     def set_CartesianPoint(self, position):
         cp_msg = CartesianPoint()
         orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
-        # orientation = Quaternion(x=0.92244, y=-0.38613, z=-0.00235, w=-0.000504)
         cp_msg.pose = self.set_PoseMsgs(position, orientation)
         return cp_msg
 

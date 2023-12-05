@@ -1,13 +1,12 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image as msg_Image
-from sensor_msgs.msg import CameraInfo
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CameraInfo
 import numpy as np
 import pyrealsense2 as rs2
 import cv2
-if (not hasattr(rs2, 'intrinsics')):
+
+if not hasattr(rs2, "intrinsics"):
     import pyrealsense2.pyrealsense2 as rs2
 import tf2_ros
 from tf2_ros.transform_listener import TransformListener
@@ -18,18 +17,19 @@ from geometry_msgs.msg import TransformStamped
 
 class ImageListener(Node):
     def __init__(self):
-
         super().__init__("imagelistener")
         self.camera_rgb_subscriber = self.create_subscription(
-            Image, '/camera/color/image_raw', self.camera_rgb_callback, 10)
+            Image, "/camera/color/image_raw", self.camera_rgb_callback, 10
+        )
         self.bridge = CvBridge()
-        self.timer = self.create_timer(1/100, self.timer_callback)
+        self.timer = self.create_timer(1 / 100, self.timer_callback)
         self.last_image = None
 
         self.buffer = Buffer()
         self.listener = TransformListener(self.buffer, self)
         self.camera_info = self.create_subscription(
-            CameraInfo, '/camera/color/camera_info', self.camera_info_cb, 10)
+            CameraInfo, "/camera/color/camera_info", self.camera_info_cb, 10
+        )
         self.tf_broadcaster = TransformBroadcaster(self)
         self.cx_purple = None
         self.cy_purple = None
@@ -100,17 +100,15 @@ class ImageListener(Node):
         self.intrinsics.width = msg.width
 
     def camera_rgb_callback(self, msg):
-        """Callback function for the camera image subscriber."""
-        self.last_image = self.bridge.imgmsg_to_cv2(
-            msg, desired_encoding='bgr8')
+        """Call back function for the camera image subscriber."""
+        self.last_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
     def click_event(self, event, x, y, flags, params):
         # checking for left mouse clicks
         if event == cv2.EVENT_LBUTTONDOWN:
-
             # displaying the coordinates
             # on the Shell
-            print(x, ' ', y)
+            print(x, " ", y)
             self.get_logger().info(f"finish? {x, y}")
 
     def nothing(self, x):
@@ -121,13 +119,14 @@ class ImageListener(Node):
             # get the latest transform between left and right
             # (rclpy.time.Time() means get the latest information)
             trans = self.buffer.lookup_transform(
-                "camera_color_optical_frame", "paint", rclpy.time.Time())
+                "camera_color_optical_frame", "paint", rclpy.time.Time()
+            )
             paint_tag_x = trans.transform.translation.x
             paint_tag_y = trans.transform.translation.y
             paint_tag_z = trans.transform.translation.z
             tag_log = [paint_tag_x, paint_tag_y, paint_tag_z]
             # self.get_logger().info(f"Tag Location: {paint_tag_x,paint_tag_y,paint_tag_z}")
-            return (tag_log)
+            return tag_log
         except tf2_ros.LookupException as e:
             # the frames don't exist yet
             self.get_logger().info(f"Lookup exception: {e}")
@@ -144,13 +143,17 @@ class ImageListener(Node):
             xoffset1 = 0.08
             xoffset2 = 0.36
             rect1 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx-xoffset1, tagposy+yoffset, tagposz])
+                self.intrinsics, [tagposx - xoffset1, tagposy + yoffset, tagposz]
+            )
             rect2 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx-xoffset1, tagposy-yoffset1, tagposz])
+                self.intrinsics, [tagposx - xoffset1, tagposy - yoffset1, tagposz]
+            )
             rect3 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx-xoffset2, tagposy-yoffset1, tagposz])
+                self.intrinsics, [tagposx - xoffset2, tagposy - yoffset1, tagposz]
+            )
             rect4 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx-xoffset2, tagposy+yoffset, tagposz])
+                self.intrinsics, [tagposx - xoffset2, tagposy + yoffset, tagposz]
+            )
             # rect = np.array([[1002,257],[1028,526],[1231,509],[1207,207]])
             rect = np.array([rect1, rect2, rect3, rect4], np.int32)
             cv2.fillConvexPoly(mask, rect, 1)
@@ -225,20 +228,20 @@ class ImageListener(Node):
         img_open2 = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernelo)
         img_open3 = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernelo)
         img_close_purple = cv2.morphologyEx(img_open, cv2.MORPH_CLOSE, kernelc)
-        img_close_yellow = cv2.morphologyEx(
-            img_open1, cv2.MORPH_CLOSE, kernelc)
+        img_close_yellow = cv2.morphologyEx(img_open1, cv2.MORPH_CLOSE, kernelc)
         img_close_red = cv2.morphologyEx(img_open2, cv2.MORPH_CLOSE, kernelc)
         img_close_blue = cv2.morphologyEx(img_open3, cv2.MORPH_CLOSE, kernelc)
 
-        res_purple = cv2.bitwise_and(masked, masked, mask=img_close_purple)
-        res_yellow = cv2.bitwise_and(masked, masked, mask=img_close_yellow)
-        res_red = cv2.bitwise_and(masked, masked, mask=img_close_red)
-        res_blue = cv2.bitwise_and(masked, masked, mask=img_close_blue)
-        res_green = cv2.bitwise_and(masked, masked, mask=green_mask)
-        res_orange = cv2.bitwise_and(masked, masked, mask=orange_mask)
+        # res_purple = cv2.bitwise_and(masked, masked, mask=img_close_purple)
+        # res_yellow = cv2.bitwise_and(masked, masked, mask=img_close_yellow)
+        # res_red = cv2.bitwise_and(masked, masked, mask=img_close_red)
+        # res_blue = cv2.bitwise_and(masked, masked, mask=img_close_blue)
+        # res_green = cv2.bitwise_and(masked, masked, mask=green_mask)
+        # res_orange = cv2.bitwise_and(masked, masked, mask=orange_mask)
 
         contours, hierarchy = cv2.findContours(
-            img_close_purple, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            img_close_purple, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        )
         # print(len(contours))
 
         biggest_contour = 0
@@ -250,18 +253,28 @@ class ImageListener(Node):
 
             M = cv2.moments(biggest_contour)
             try:
-                self.cx_purple = int(M['m10']/M['m00'])
-                self.cy_purple = int(M['m01']/M['m00'])
+                self.cx_purple = int(M["m10"] / M["m00"])
+                self.cy_purple = int(M["m01"] / M["m00"])
 
-                cv2.circle(masked, (self.cx_purple, self.cy_purple),
-                           3, (255, 255, 255), -1)
-                cv2.putText(masked, 'purple_centroid', (self.cx_purple-10, self.cy_purple-10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.circle(
+                    masked, (self.cx_purple, self.cy_purple), 3, (255, 255, 255), -1
+                )
+                cv2.putText(
+                    masked,
+                    "purple_centroid",
+                    (self.cx_purple - 10, self.cy_purple - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 255),
+                    2,
+                    cv2.LINE_AA,
+                )
             except:
                 self.get_logger().info("purple not detected")
 
         contours, hierarchy = cv2.findContours(
-            img_close_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            img_close_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        )
         # print(len(contours))
 
         biggest_contour = 0
@@ -272,18 +285,28 @@ class ImageListener(Node):
                     biggest_contour = contours[a]
             M = cv2.moments(biggest_contour)
             try:
-                self.cx_yellow = int(M['m10']/M['m00'])
-                self.cy_yellow = int(M['m01']/M['m00'])
+                self.cx_yellow = int(M["m10"] / M["m00"])
+                self.cy_yellow = int(M["m01"] / M["m00"])
 
-                cv2.circle(masked, (self.cx_yellow, self.cy_yellow),
-                           3, (255, 255, 255), -1)
-                cv2.putText(masked, 'yellow_centroid', (self.cx_yellow-10, self.cy_yellow-10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.circle(
+                    masked, (self.cx_yellow, self.cy_yellow), 3, (255, 255, 255), -1
+                )
+                cv2.putText(
+                    masked,
+                    "yellow_centroid",
+                    (self.cx_yellow - 10, self.cy_yellow - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 255),
+                    2,
+                    cv2.LINE_AA,
+                )
             except:
                 self.get_logger().info("yellow not detected")
 
         contours, hierarchy = cv2.findContours(
-            img_close_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            img_close_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        )
         # print(len(contours))
 
         biggest_contour = 0
@@ -295,17 +318,25 @@ class ImageListener(Node):
 
             M = cv2.moments(biggest_contour)
             try:
-                self.cx_red = int(M['m10']/M['m00'])
-                self.cy_red = int(M['m01']/M['m00'])
-                cv2.circle(masked, (self.cx_red, self.cy_red),
-                           3, (255, 255, 255), -1)
-                cv2.putText(masked, 'red_centroid', (self.cx_red-10, self.cy_red-10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                self.cx_red = int(M["m10"] / M["m00"])
+                self.cy_red = int(M["m01"] / M["m00"])
+                cv2.circle(masked, (self.cx_red, self.cy_red), 3, (255, 255, 255), -1)
+                cv2.putText(
+                    masked,
+                    "red_centroid",
+                    (self.cx_red - 10, self.cy_red - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 255),
+                    2,
+                    cv2.LINE_AA,
+                )
             except:
                 self.get_logger().info("red not detected")
 
         contours, hierarchy = cv2.findContours(
-            img_close_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            img_close_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        )
         # print(len(contours))
 
         biggest_contour = 0
@@ -317,18 +348,26 @@ class ImageListener(Node):
 
             M = cv2.moments(biggest_contour)
             try:
-                self.cx_blue = int(M['m10']/M['m00'])
-                self.cy_blue = int(M['m01']/M['m00'])
+                self.cx_blue = int(M["m10"] / M["m00"])
+                self.cy_blue = int(M["m01"] / M["m00"])
 
-                cv2.circle(masked, (self.cx_blue, self.cy_blue),
-                           3, (255, 255, 255), -1)
-                cv2.putText(masked, 'blue_centroid', (self.cx_blue-10, self.cy_blue-10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.circle(masked, (self.cx_blue, self.cy_blue), 3, (255, 255, 255), -1)
+                cv2.putText(
+                    masked,
+                    "blue_centroid",
+                    (self.cx_blue - 10, self.cy_blue - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 255),
+                    2,
+                    cv2.LINE_AA,
+                )
             except:
                 self.get_logger().info("blue not detected")
 
         contours, hierarchy = cv2.findContours(
-            green_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            green_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        )
         # print(len(contours))
 
         biggest_contour = 0
@@ -340,18 +379,28 @@ class ImageListener(Node):
 
             M = cv2.moments(biggest_contour)
             try:
-                self.cx_green = int(M['m10']/M['m00'])
-                self.cy_green = int(M['m01']/M['m00'])
+                self.cx_green = int(M["m10"] / M["m00"])
+                self.cy_green = int(M["m01"] / M["m00"])
 
-                cv2.circle(masked, (self.cx_green, self.cy_green),
-                           3, (255, 255, 255), -1)
-                cv2.putText(masked, 'green_centroid', (self.cx_green-10, self.cy_green-10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.circle(
+                    masked, (self.cx_green, self.cy_green), 3, (255, 255, 255), -1
+                )
+                cv2.putText(
+                    masked,
+                    "green_centroid",
+                    (self.cx_green - 10, self.cy_green - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 255),
+                    2,
+                    cv2.LINE_AA,
+                )
             except:
                 self.get_logger().info("green not detected")
 
         contours, hierarchy = cv2.findContours(
-            orange_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            orange_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        )
         # print(len(contours))
 
         biggest_contour = 0
@@ -363,17 +412,26 @@ class ImageListener(Node):
 
             M = cv2.moments(biggest_contour)
             try:
-                self.cx_orange = int(M['m10']/M['m00'])
-                self.cy_orange = int(M['m01']/M['m00'])
+                self.cx_orange = int(M["m10"] / M["m00"])
+                self.cy_orange = int(M["m01"] / M["m00"])
 
-                cv2.circle(masked, (self.cx_orange, self.cy_orange),
-                           3, (255, 255, 255), -1)
-                cv2.putText(masked, 'orange_centroid', (self.cx_orange-10, self.cy_orange-10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.circle(
+                    masked, (self.cx_orange, self.cy_orange), 3, (255, 255, 255), -1
+                )
+                cv2.putText(
+                    masked,
+                    "orange_centroid",
+                    (self.cx_orange - 10, self.cy_orange - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 255),
+                    2,
+                    cv2.LINE_AA,
+                )
             except:
                 self.get_logger().info("orange not detected")
 
-        conto = cv2.drawContours(masked, contours, -1, (0, 255, 0), 3)
+        # conto = cv2.drawContours(masked, contours, -1, (0, 255, 0), 3)
 
         # cv2.imshow('Thresh', conto)
         # cv2.setMouseCallback('Thresh', self.click_event)
@@ -403,14 +461,15 @@ class ImageListener(Node):
         depth = tagpos[2]
         if self.cx_yellow is not None and self.cy_yellow is not None:
             yellow_pos = rs2.rs2_deproject_pixel_to_point(
-                self.intrinsics, [self.cx_yellow, self.cy_yellow], depth)
+                self.intrinsics, [self.cx_yellow, self.cy_yellow], depth
+            )
             r = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             r.header.stamp = self.get_clock().now().to_msg()
-            r.header.frame_id = 'camera_color_optical_frame'
-            r.child_frame_id = 'yellow_color'
+            r.header.frame_id = "camera_color_optical_frame"
+            r.child_frame_id = "yellow_color"
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
@@ -422,14 +481,15 @@ class ImageListener(Node):
 
         if self.cx_purple is not None and self.cy_purple is not None:
             purple_pos = rs2.rs2_deproject_pixel_to_point(
-                self.intrinsics, [self.cx_purple, self.cy_purple], depth)
+                self.intrinsics, [self.cx_purple, self.cy_purple], depth
+            )
             b = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             b.header.stamp = self.get_clock().now().to_msg()
-            b.header.frame_id = 'camera_color_optical_frame'
-            b.child_frame_id = 'purple_color'
+            b.header.frame_id = "camera_color_optical_frame"
+            b.child_frame_id = "purple_color"
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
@@ -441,14 +501,15 @@ class ImageListener(Node):
 
         if self.cx_red is not None and self.cy_red is not None:
             red_pos = rs2.rs2_deproject_pixel_to_point(
-                self.intrinsics, [self.cx_red, self.cy_red], depth)
+                self.intrinsics, [self.cx_red, self.cy_red], depth
+            )
             g = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             g.header.stamp = self.get_clock().now().to_msg()
-            g.header.frame_id = 'camera_color_optical_frame'
-            g.child_frame_id = 'red_color'
+            g.header.frame_id = "camera_color_optical_frame"
+            g.child_frame_id = "red_color"
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
@@ -460,14 +521,15 @@ class ImageListener(Node):
 
         if self.cx_blue is not None and self.cy_blue is not None:
             blue_pos = rs2.rs2_deproject_pixel_to_point(
-                self.intrinsics, [self.cx_blue, self.cy_blue], depth)
+                self.intrinsics, [self.cx_blue, self.cy_blue], depth
+            )
             y = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             y.header.stamp = self.get_clock().now().to_msg()
-            y.header.frame_id = 'camera_color_optical_frame'
-            y.child_frame_id = 'blue_color'
+            y.header.frame_id = "camera_color_optical_frame"
+            y.child_frame_id = "blue_color"
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
@@ -479,14 +541,15 @@ class ImageListener(Node):
 
         if self.cx_green is not None and self.cy_green is not None:
             green_pos = rs2.rs2_deproject_pixel_to_point(
-                self.intrinsics, [self.cx_green, self.cy_green], depth)
+                self.intrinsics, [self.cx_green, self.cy_green], depth
+            )
             o = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             o.header.stamp = self.get_clock().now().to_msg()
-            o.header.frame_id = 'camera_color_optical_frame'
-            o.child_frame_id = 'green_color'
+            o.header.frame_id = "camera_color_optical_frame"
+            o.child_frame_id = "green_color"
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
@@ -498,14 +561,15 @@ class ImageListener(Node):
 
         if self.cx_orange is not None and self.cy_orange is not None:
             orange_pos = rs2.rs2_deproject_pixel_to_point(
-                self.intrinsics, [self.cx_orange, self.cy_orange], depth)
+                self.intrinsics, [self.cx_orange, self.cy_orange], depth
+            )
             p = TransformStamped()
 
             # Read message content and assign it to
             # corresponding tf variables
             p.header.stamp = self.get_clock().now().to_msg()
-            p.header.frame_id = 'camera_color_optical_frame'
-            p.child_frame_id = 'orange_color'
+            p.header.frame_id = "camera_color_optical_frame"
+            p.child_frame_id = "orange_color"
 
             # Turtle only exists in 2D, thus we get x and y translation
             # coordinates from the message and set the z coordinate to 0
