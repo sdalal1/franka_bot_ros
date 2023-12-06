@@ -1,3 +1,24 @@
+"""
+
+Detects color on the palette placed in Franka's Workspace
+
+Publishers:
+  + None
+
+Service:
+  + None
+
+Subscriptions:
+  + image_raw Image - Topic provides the raw image from the realsense camera
+  + camera_info CamerInfo - Infomation regarding the camera
+
+Parameters
+----------
+  + None
+
+"""
+
+
 import rclpy
 from rclpy.node import Node
 from cv_bridge import CvBridge
@@ -47,7 +68,17 @@ class ImageListener(Node):
         self.intrinsics = None
 
     def camera_info_cb(self, msg):
-        """Find camera information."""
+        """
+        Receive the camera intrinsincs values for pixel to distance collaboration 
+
+        Args:
+            msg: Empty request
+
+        Returns
+        -------
+            An empty response
+
+        """
         value = msg.k
         self.intrinsics = rs2.intrinsics()
         self.intrinsics.coeffs = msg.d

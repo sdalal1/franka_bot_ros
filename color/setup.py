@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'CvBridge'
+package_name = 'color'
 
 setup(
     name=package_name,
@@ -15,12 +15,12 @@ setup(
     zip_safe=True,
     maintainer='sdalal',
     maintainer_email='shaildalal2024@u.northwestern.edu',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Packge detects the position of colors on the palette and broadcasts colors frames to the tf tree',
+    license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'depth = CvBridge.depth:main'
+            'colordetection = color.colordetection:main'
         ],
     },
 )

@@ -17,7 +17,7 @@ The aim of this project was to paint dot an image using the Emika Franka Panda 7
 5. In `mattagascar\mattagascar\iliketomoveitmoveit.py`, edit `file_name` to match and load the saved path of the `.json` file of desired image. 
 6. On laptop from the workspace containing our packages, run `ros2 launch listen_apriltags aprilTags.launch.xml` to start the realsense camera, rviz, and the april_tag node.
     - Before continuing, make sure there are no warnings within the tf tree in rviz and proceed
-7. Also in the workspace containing the packages, run `ros2 run CvBridge depth` to start the color detection of the paint locations.  
+7. Also in the workspace containing the packages, run `ros2 run color colordetection` to start the color detection of the paint locations.  
 8. Lastly, from the folder containing the desired image json, run `ros2 run mattagascar iliketomoveitmoveit`
 9. Finally, sit back and enjoy the robot painting :)
 
@@ -40,7 +40,7 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 
 `take_picture_interfaces` contains the custom message type to publish the dot locations.
 
-`CvBridge` package identifies the location of each paint color. This node listens to the tf tree to find the palette location. After recieving palette location, it uses color detection within a specified radius to narrow the field of detection for each color.
+`color` package identifies the location of each paint color. This node listens to the tf tree to find the palette location. After recieving palette location, it uses color detection within a specified radius to narrow the field of detection for each color.
 
 ### Nodes
 
@@ -50,7 +50,7 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 
 `picture_node` - This node offers a service to take a picture through the realsense camera. The image is processed into waypoints which are published to the 'outline_waypoints' topic.
 
-`Depth` - This node tracks the location of the paint colors on the palette.
+`colordetection` - The node is used to detect color in the palette placed in franka's workspace.The node uses Computer Vision to create a mask around the palette and braodcasts the location of each color with respect to the Franka's base frame (panda_link_0). The supported colors are blue, green,orange,purple,red and yellow. 
 
 ### Custom Messages
 
@@ -64,6 +64,8 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 ### Relevant Algorithms
 
 - Canny edge detection 
+- Comupter Vision Thresholding,
+- Color HSV tracking
 - Color thresholding, blob tracking
   
 ### Future Work
