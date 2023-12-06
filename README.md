@@ -58,7 +58,7 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 
 `take_picture_interfaces/msg/Waypoint` - contains the position of a singular waypoint (x,y)
 
-`take_picture_interfaces/msg/WaypointList` - contains array of waypoint types
+`take_picture_interfaces/msg/WaypointList` - contains array of the Waypoint type
 
 
 ### Relevant Algorithms
