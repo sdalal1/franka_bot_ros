@@ -11,14 +11,14 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml',
                                    'launch/take_picture.launch.xml',
-                                   'config/pcl.rviz']),
+                                   ]),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='naderahmed',
     maintainer_email='naderahmed2024@u.northwestern.edu',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Take a picture of a person to generate waypoints for BotROS.',
+    license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [

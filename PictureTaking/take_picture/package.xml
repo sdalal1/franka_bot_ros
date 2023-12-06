@@ -3,9 +3,9 @@
 <package format="3">
   <name>take_picture</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Take a picture of a person to generate waypoints for BotROS.</description>
   <maintainer email="naderahmed2024@u.northwestern.edu">naderahmed</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT</license>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
