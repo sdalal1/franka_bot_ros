@@ -1,0 +1,12 @@
+<launch>
+  <node pkg="take_picture" exec="picture_node" output="screen">
+    <remap from="pcl_handler" to="/camera/depth/color/points" />
+  </node>
+
+  <include file="$(find-pkg-share realsense2_camera)/launch/rs_launch.py" >
+    <arg name="depth_module.profile" value="1280x720x30"/>
+    <arg name="pointcloud.enable" value="true" />
+  </include>
+
+  <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share take_picture)/pcl.rviz" />
+</launch>
