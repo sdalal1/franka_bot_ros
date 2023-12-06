@@ -64,7 +64,6 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 ### Relevant Algorithms
 
 - Canny edge detection 
-- Comupter Vision Thresholding,
 - Color HSV tracking
 - Color thresholding, blob tracking
   
