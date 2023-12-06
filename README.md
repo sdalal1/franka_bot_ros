@@ -58,14 +58,14 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 
 `listen_apriltags_interfaces/msg/Loc` - contains the location of the paint brushes and paint palette as a float array of x,y, and z positions
 
-`take_picture_interfaces/msg/Waypoint` - contains the position of a singular waypoint 
+`take_picture_interfaces/msg/Waypoint` - contains the position of a singular waypoint (x,y)
 
-`take_picture_interfaces/msg/WaypointList` - contains list of waypoint types
+`take_picture_interfaces/msg/WaypointList` - contains array of waypoint types
 
 
 ### Relevant Algorithms
 
-- Canny Edge Detection
+- Canny edge detection 
 - Color thresholding, blob tracking
   
 ### Future Work
