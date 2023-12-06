@@ -3,9 +3,9 @@
 <package format="3">
   <name>listen_apriltags</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>creates transforms using apriltags</description>
   <maintainer email="courtney77smith77@gmail.com">csmith</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT</license>
 
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>rclpy</exec_depend>

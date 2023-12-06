@@ -3,9 +3,9 @@
 <package format="3">
   <name>mattagascar</name>
   <version>0.0.0</version>
-  <description>API for interfacing with a PincherX100 and Franka Panda manipulators via moveit2</description>
+  <description>package containing motion for painting</description>
   <maintainer email="demianabarsoum2027@u.northwestern.edu">demiana</maintainer>
-  <license>MIT License</license>
+  <license>MIT</license>
 
   <exec_depend>franka_description</exec_depend>
   <exec_depend>franka_hardware</exec_depend>

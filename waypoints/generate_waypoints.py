@@ -1,3 +1,5 @@
+"""Generates Waypoints for an image to be used for Cartesian planning"""
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

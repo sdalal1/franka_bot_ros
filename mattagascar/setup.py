@@ -16,7 +16,7 @@ setup(
     zip_safe=True,
     maintainer='demiana',
     maintainer_email='demianabarsoum2027@u.northwestern.edu',
-    description='API for interfacing with a PincherX100 and Franka Panda manipulators via moveit2',
+    description='package containing motion for painting',
     license='MIT License',
     tests_require=['pytest'],
     entry_points={

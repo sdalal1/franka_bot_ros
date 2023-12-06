@@ -413,7 +413,17 @@ class ImageListener(Node):
         cv2.waitKey(1)
 
     def broadcaster(self, tagpos):
-        """Broadcast the location of each paint color."""
+        """
+        Broadcast location of each paint with respect to panda_link_0.
+
+        Args:
+            tagpos: Positon of the palette apriltag.
+
+        Returns
+        -------
+            An Empty response.
+
+        """
         depth = tagpos[2]
         if self.cx_yellow is not None and self.cy_yellow is not None:
             yellow_pos = rs2.rs2_deproject_pixel_to_point(
@@ -512,6 +522,7 @@ class ImageListener(Node):
             self.tf_broadcaster.sendTransform(p)
 
     def timer_callback(self):
+        """Run at a set frequency."""
         try:
             tagloc = self.taglistener()
         except tf2_ros.LookupException as e:
@@ -527,6 +538,7 @@ class ImageListener(Node):
 
 
 def main(args=None):
+    """Run main function."""
     rclpy.init(args=args)
     node = ImageListener()
     rclpy.spin(node)

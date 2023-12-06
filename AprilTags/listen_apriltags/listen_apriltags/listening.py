@@ -1,3 +1,22 @@
+"""
+
+ConnectS the camera frame and the robot frame through AprilTags.
+
+PUBLISHERS:
+  + paint_loc - the location of the paint brushes and palette
+
+SUBSCRIBERS:
+  +  NONE
+
+SERVICES:
+  +  NONE
+
+PARAMS:
+  +  NONE
+
+"""
+
+
 import rclpy
 from rclpy.node import Node
 from listen_apriltags_interface.msg import Loc
@@ -10,11 +29,21 @@ from enum import Enum, auto
 
 
 class State(Enum):
+    """
+
+    Current state of the apriltags system.
+
+    Determines what the main timer function should be doing on each iteration.
+
+    """
+
     CALIBRATING = (auto(),)
     TRANSFORMING = (auto(),)
 
 
 class listener(Node):
+    """Publishe transforms bw the camera, robot, paintbrush, and palette."""
+
     def __init__(self):
         super().__init__("listener")
 

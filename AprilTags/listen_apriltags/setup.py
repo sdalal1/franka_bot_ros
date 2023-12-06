@@ -18,8 +18,8 @@ setup(
     zip_safe=True,
     maintainer='csmith',
     maintainer_email='courtney77smith77@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='creates transforms using apriltags',
+    license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [

@@ -1,4 +1,21 @@
-"""This node is used to test the functionality of the frankastein package."""
+"""
+
+This node is used to run the main functionality of the botROS robot demonstration.
+
+SUBSCRIBERS:
+  +  paint_loc (listen_apriltags_interface/Loc): Gets position of the paint brushes.
+
+PUBLISHERS:
+  + NONE
+
+SERVICES:
+  +  NONE
+
+PARAMS:
+  +  NONE
+
+"""
+
 
 import rclpy
 from rclpy.node import Node
@@ -49,10 +66,13 @@ class State(Enum):
 
 class ILikeToMoveItMoveIt(Node):
     """
-    Test Node. Commented code includes functions that work with interbotix.
+    FrankaStein wrapper used to control robot, and the Gripper class used to control gripper.
 
-    Tried with different positions and orientations.
+    Uses the AprilTag to determine locations of paint and paintbrushes.
 
+    Color detection is used to determine the color of each paint on pallete.
+
+    The robot moves based on cartesian planning.
     """
 
     def __init__(self):
@@ -62,7 +82,8 @@ class ILikeToMoveItMoveIt(Node):
         self.con1 = 0
         self.grasping = Gripper(self)
         self.con = 0
-        self.orientation = Quaternion(x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
+        self.orientation = Quaternion(
+            x=0.96791, y=-0.24773, z=0.017813, w=0.038285)
 
         self.orientation1 = self.orientation
         self.state = State.START
@@ -131,7 +152,17 @@ class ILikeToMoveItMoveIt(Node):
         self.count_brush = 0
 
     def apriltagloc_cb(self, msg: Loc):
-        """Get position of the paint brushes."""
+        """
+        Get position of the paint brushes via the subscription from the paint_loc topic.
+
+        Args:
+            msg (Loc): Message from the paint_loc topic.
+
+        Returns
+        -------
+            None.
+
+        """
         if self.count_brush == 0:
             try:
                 self.brushlocs["purple"] = msg.purple
@@ -150,7 +181,7 @@ class ILikeToMoveItMoveIt(Node):
                 )
 
     def set_PaintLocs(self):
-        """Get position of current paint color."""
+        """Get position of current paint color via a transform."""
         try:
             # get the latest transform between left and right
             trans = self.buffer.lookup_transform(
@@ -178,6 +209,7 @@ class ILikeToMoveItMoveIt(Node):
         self.paint_location_dip.position.y = self.current_paint_y
 
     def timer_callback(self):
+        """Use to determine what the robot should be doing at any given time."""
         if self.state == State.START:
             self.get_logger().info("Making sure we start here all the time")
             start = input("Enter s to begin: ")
@@ -210,7 +242,8 @@ class ILikeToMoveItMoveIt(Node):
             # # this is the position of the paint pallete
             try:
                 # standoff pose
-                self.get_logger().info(f"Current Color PICKUP: {self.current_color}")
+                self.get_logger().info(
+                    f"Current Color PICKUP: {self.current_color}")
                 self.pickup_loc = Pose()
                 self.get_logger().info(f"BRUSH LOCATION: {self.brushlocs}")
                 self.pickup_loc.position.x = self.brushlocs[self.current_color][0]
@@ -278,7 +311,8 @@ class ILikeToMoveItMoveIt(Node):
 
             if not self.current_waypoints:
                 self.get_logger().info("self.curent_waypoints is Empty")
-                self.home = input("Return paintbrush back and change color? (y/n): ")
+                self.home = input(
+                    "Return paintbrush back and change color? (y/n): ")
                 self.state = State.DONE
 
             else:
