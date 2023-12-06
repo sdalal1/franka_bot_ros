@@ -17,7 +17,7 @@ The aim of this project was to paint dot an image using the Emika Franka Panda 7
 5. In `mattagascar\mattagascar\iliketomoveitmoveit.py`, edit `file_name` to match and load the saved path of the `.json` file of desired image. 
 6. On laptop from the workspace containing our packages, run `ros2 launch listen_apriltags aprilTags.launch.xml` to start the realsense camera, rviz, and the april_tag node.
     - Before continuing, make sure there are no warnings within the tf tree in rviz and proceed
-7. Also in the workspace containing the packages, run `ros2 run color colordetection` to start the color detection of the paint locations.  
+7. After confirming that april tags were launched succesfully, run `ros2 run color colordetection` in the workspace containing the packages to start the color detection of the paint locations.  
 8. Lastly, from the folder containing the desired image json, run `ros2 run mattagascar iliketomoveitmoveit`
 9. Finally, sit back and enjoy the robot painting :)
 
