@@ -3,7 +3,7 @@
 <package format="3">
   <name>color</name>
   <version>0.0.0</version>
-  <description>Packge detects the position of colors on the palette and broadcasts colors frames to the tf tree</description>
+  <description>Packge detects the position of colors on the palette and broadcasts them to tf</description>
   <maintainer email="shaildalal2024@u.northwestern.edu">sdalal</maintainer>
   <license>MIT</license>
 

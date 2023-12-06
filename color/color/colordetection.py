@@ -1,6 +1,6 @@
 """
 
-Detects color on the palette placed in Franka's Workspace
+Detects color on the palette placed in Franka's Workspace.
 
 Publishers:
   + None
@@ -69,10 +69,10 @@ class ImageListener(Node):
 
     def camera_info_cb(self, msg):
         """
-        Receive the camera intrinsincs values for pixel to distance collaboration 
+        Receive the camera intrinsincs values for pixel to distance calculations.
 
         Args:
-            msg: Empty request
+            msg: msg returns camera intrinsic infomation
 
         Returns
         -------
@@ -90,18 +90,22 @@ class ImageListener(Node):
         self.intrinsics.width = msg.width
 
     def camera_rgb_callback(self, msg):
-        """Call back function for the camera image subscriber."""
-        self.last_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        """
+        Receive the video captured by the camera.
 
-    def click_event(self, event, x, y, flags, params):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            self.get_logger().info(f"finish? {x, y}")
+        Args:
+            msg: msg returns last image from the camera
 
-    def nothing(self, x):
-        pass
+        Returns
+        -------
+            An empty response
+
+        """
+        self.last_image = self.bridge.imgmsg_to_cv2(
+            msg, desired_encoding="bgr8")
 
     def taglistener(self):
-        """Listen for the location of the paint palette."""
+        """Listen for the location of the paint palette april-tag location."""
         try:
             trans = self.buffer.lookup_transform(
                 "camera_color_optical_frame", "paint", rclpy.time.Time()
@@ -115,7 +119,18 @@ class ImageListener(Node):
             self.get_logger().info(f"Lookup exception: {e}")
 
     def masking(self, image, tagpos):
-        """Create the mask on the camera from the position of the palette apriltag."""
+        """
+        Maskes the camera stream to the location of the palette inthe workspace.
+
+        Args:
+            image: Image captured by the camera
+            tagpos: Position of the palete april-tag location
+
+        Returns
+        -------
+            masked: masked image
+
+        """
         mask = np.zeros(image.shape[:2], dtype="uint8")
         tagposx = tagpos[0]
         tagposy = tagpos[1]
@@ -126,16 +141,20 @@ class ImageListener(Node):
             xoffset1 = 0.08
             xoffset2 = 0.36
             rect1 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx - xoffset1, tagposy + yoffset, tagposz]
+                self.intrinsics, [tagposx - xoffset1,
+                                  tagposy + yoffset, tagposz]
             )
             rect2 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx - xoffset1, tagposy - yoffset1, tagposz]
+                self.intrinsics, [tagposx - xoffset1,
+                                  tagposy - yoffset1, tagposz]
             )
             rect3 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx - xoffset2, tagposy - yoffset1, tagposz]
+                self.intrinsics, [tagposx - xoffset2,
+                                  tagposy - yoffset1, tagposz]
             )
             rect4 = rs2.rs2_project_point_to_pixel(
-                self.intrinsics, [tagposx - xoffset2, tagposy + yoffset, tagposz]
+                self.intrinsics, [tagposx - xoffset2,
+                                  tagposy + yoffset, tagposz]
             )
             rect = np.array([rect1, rect2, rect3, rect4], np.int32)
             cv2.fillConvexPoly(mask, rect, 1)
@@ -143,7 +162,17 @@ class ImageListener(Node):
             return masked
 
     def colordetenction(self, masked):
-        """Detect the location of the largest color contour."""
+        """
+        Perform Computer Vision to detect color in the masked region.
+
+        Args:
+            masked: masked image from the function
+
+        Returns
+        -------
+            An empty response
+
+        """
         hsv = cv2.cvtColor(masked, cv2.COLOR_BGR2HSV)
 
         lower_purple = np.array([114, 20, 86], np.uint8)
@@ -184,7 +213,8 @@ class ImageListener(Node):
         img_open2 = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernelo)
         img_open3 = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernelo)
         img_close_purple = cv2.morphologyEx(img_open, cv2.MORPH_CLOSE, kernelc)
-        img_close_yellow = cv2.morphologyEx(img_open1, cv2.MORPH_CLOSE, kernelc)
+        img_close_yellow = cv2.morphologyEx(
+            img_open1, cv2.MORPH_CLOSE, kernelc)
         img_close_red = cv2.morphologyEx(img_open2, cv2.MORPH_CLOSE, kernelc)
         img_close_blue = cv2.morphologyEx(img_open3, cv2.MORPH_CLOSE, kernelc)
 
@@ -205,7 +235,8 @@ class ImageListener(Node):
                 self.cy_purple = int(M["m01"] / M["m00"])
 
                 cv2.circle(
-                    masked, (self.cx_purple, self.cy_purple), 3, (255, 255, 255), -1
+                    masked, (self.cx_purple,
+                             self.cy_purple), 3, (255, 255, 255), -1
                 )
                 cv2.putText(
                     masked,
@@ -236,7 +267,8 @@ class ImageListener(Node):
                 self.cy_yellow = int(M["m01"] / M["m00"])
 
                 cv2.circle(
-                    masked, (self.cx_yellow, self.cy_yellow), 3, (255, 255, 255), -1
+                    masked, (self.cx_yellow,
+                             self.cy_yellow), 3, (255, 255, 255), -1
                 )
                 cv2.putText(
                     masked,
@@ -266,7 +298,8 @@ class ImageListener(Node):
             try:
                 self.cx_red = int(M["m10"] / M["m00"])
                 self.cy_red = int(M["m01"] / M["m00"])
-                cv2.circle(masked, (self.cx_red, self.cy_red), 3, (255, 255, 255), -1)
+                cv2.circle(masked, (self.cx_red, self.cy_red),
+                           3, (255, 255, 255), -1)
                 cv2.putText(
                     masked,
                     "red_centroid",
@@ -296,7 +329,8 @@ class ImageListener(Node):
                 self.cx_blue = int(M["m10"] / M["m00"])
                 self.cy_blue = int(M["m01"] / M["m00"])
 
-                cv2.circle(masked, (self.cx_blue, self.cy_blue), 3, (255, 255, 255), -1)
+                cv2.circle(masked, (self.cx_blue, self.cy_blue),
+                           3, (255, 255, 255), -1)
                 cv2.putText(
                     masked,
                     "blue_centroid",
@@ -327,7 +361,8 @@ class ImageListener(Node):
                 self.cy_green = int(M["m01"] / M["m00"])
 
                 cv2.circle(
-                    masked, (self.cx_green, self.cy_green), 3, (255, 255, 255), -1
+                    masked, (self.cx_green,
+                             self.cy_green), 3, (255, 255, 255), -1
                 )
                 cv2.putText(
                     masked,
@@ -359,7 +394,8 @@ class ImageListener(Node):
                 self.cy_orange = int(M["m01"] / M["m00"])
 
                 cv2.circle(
-                    masked, (self.cx_orange, self.cy_orange), 3, (255, 255, 255), -1
+                    masked, (self.cx_orange,
+                             self.cy_orange), 3, (255, 255, 255), -1
                 )
                 cv2.putText(
                     masked,
