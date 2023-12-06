@@ -14,17 +14,16 @@ The aim of this project was to paint dot an image using the Emika Franka Panda 7
 2. Access the robot arm through the terminal: ssh into `ssh student@station`.
 3. On `station`, run `run ros2 launch franka_moveit_config moveit.launch.py use_rviz:=false robot_ip:=panda0.robot` to start the controllers and moveit.
 4. On laptop, `cd` into workspace containing our packages.
+5. In `mattagascar\mattagascar\iliketomoveitmoveit.py`, edit `file_name` to match and load the saved path of the `.json` file of desired image. 
+6. On laptop from the workspace containing our packages, run `ros2 launch listen_apriltags aprilTags.launch.xml` to start the realsense camera, rviz, and the april_tag node.
+    - Before continuing, make sure there are no warnings within the tf tree in rviz and proceed
+7. Also in the workspace containing the packages, run `ros2 run CvBridge depth` to start the color detection of the paint locations.  
+8. Lastly, from the folder containing the desired image json, run `ros2 run mattagascar iliketomoveitmoveit`
+9. Finally, sit back and enjoy the robot painting :)
 
-## Preset Images
+## Images
 To visualize the preset image data loaded in `/waypoints/jsons`, run `python3 generate_waypoints` within the `waypoints` directory.
 For painting novel drawings, place an image in `/waypoints/images`. The waypoint generator can then be used to create a new .json file for drawing.
-
-1. In `mattagascar\mattagascar\iliketomoveitmoveit.py`, edit `file_name` to match and load the saved path of the `.json` file of desired image. 
-2. On laptop from the workspace containing our packages, run `ros2 launch listen_apriltags aprilTags.launch.xml` to start the realsense camera, rviz, and the april_tag node.
-    - Before continuing, make sure there are no warnings within the tf tree in rviz and proceed
-3. Also in the workspace containing the packages, run `ros2 run CvBridge depth` to start the color detection of the paint locations.  
-4. Lastly, from the folder containing the desired image json, run `ros2 run mattagascar iliketomoveitmoveit`
-5. Finally, sit back and enjoy the robot painting :)
 
 ## Overall System Architecture and High Level 
 ### Packages:
@@ -64,14 +63,16 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 `take_picture_interfaces/msg/WaypointList` - contains list of waypoint types
 
 
-### Algorithms Used
+### Relevant Algorithms
 
+- Canny Edge Detection
+- Color thresholding, blob tracking
+  
 ### Future Work
-- use cv for the robot to detect when it needs to refill on paint
-- increase the workspace of the robot by experimenting with different psoitions of the canvas
-- incorporate dynamic location of the canvas
-- learn how to increase the speed without compromising quality and detecting collisions/odd behaviors
-
+- implement a dynamic system to check whether the paint brush needs more paint
+- optimize the number of waypoints without sacrificing image quality 
+- increase the workspace of the robot by experimenting with different canvas positions
+- incorporate a dynamic dip down distance to the canvas
 
 
 
