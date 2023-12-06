@@ -50,9 +50,7 @@ For painting novel drawings, place an image in `/waypoints/images`. The waypoint
 
 `picture_node` - This node offers a service to take a picture through the realsense camera. The image is processed into waypoints which are published to the 'outline_waypoints' topic.
 
-`ImageListener` -
-
-`Depth` - 
+`Depth` - This node tracks the location of the paint colors on the palette.
 
 ### Custom Messages
 
