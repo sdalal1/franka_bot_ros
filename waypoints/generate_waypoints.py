@@ -251,16 +251,16 @@ def make_college_logo(img_filename, json_filename, skip_points, range, scales, b
     plt.grid(False)
     plt.show()
 
-    save_to_json(points_dict, json_filename)
+    # save_to_json(points_dict, json_filename)
 
 def main():
     """Generates json files for college logos."""
 
 
-    rect_range = ((-0.2538, 0.0),
+    square_range = ((-0.2538, 0.0),
                        (0.4788, 0.73217))
 
-    square_range = ((-0.2538, 0.17),
+    rect_range =    ((-0.2538, 0.18),
                         (0.4788, 0.73217))
 
 
@@ -295,14 +295,6 @@ def main():
                       scales=(0.3, 0.3),
                       border_color="orange",
                       fill_color="red")
-
-    make_college_logo(img_filename="images/gtech.png",
-                      json_filename="gtech_yellow.json",
-                      skip_points=13,
-                      range=square_range,
-                      scales=(0.6, 0.6),
-                      border_color="blue",
-                      fill_color="yellow")
 
     make_college_logo(img_filename="images/gtech.png",
                       json_filename="gtech_blue.json",
