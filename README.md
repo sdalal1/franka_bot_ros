@@ -1,19 +1,28 @@
 # BotROS 
 Authors (Alphabetical): Nader Ahmed, Demiana Barsoum, Shail Dalal, Fiona Neylon, Courtney Smith
 
-<video src="https://github.com/ME495-EmbeddedSystems/final-project-Group5/assets/144190404/b2075725-eae9-4ce6-a66d-7d366f441078" title="BotROS at work" >
+<image src="https://github.com/ME495-EmbeddedSystems/final-project-Group5/assets/144190404/a1c4235a-0d14-4e28-bbcc-6728754631ef" title="BotROS portrait"/>
+
+<video src="ht://github.com/ME495-EmbeddedSystems/final-project-Group5/assets/144190404/b2075725-eae9-4ce6-a66d-7d366f441078" title="BotROS at work" >
 </video>
 
+
 ## Overview
-The aim of this project was to dot paint an image using the Emika Franka Panda 7 DOF robot arm. The system utilizes computer vision and color detection to identify the location of the brushes and various paint colors on a palette. The robot then plans and excecutes trajectories using a custom MoveIt API. 
+The aim of this project was to paint dot an image using the Emika Franka Panda 7 DOF robotic arm. The system utilizes computer vision and color detection to identify the location of the brushes and various paint colors on a palette. The robot then plans and excecutes trajectories using a custom MoveIt API. 
 
 ## How To Run
 1. Connect to the Franka and realsense camera
-2. Within the `ssh student@station`, `run ros2 launch franka_moveit_config moveit.launch.py use_rviz:=false robot_ip:=panda0.robot`
-3. From the workspace containing our packages, run `ros2 launch listen_apriltags aprilTags.launch.xml` to start the realsense camera, rviz, and the april_tag node
+2. Access the robot arm through the terminal: ssh into `ssh student@station`.
+3. On `station`, run `run ros2 launch franka_moveit_config moveit.launch.py use_rviz:=false robot_ip:=panda0.robot` to start the controllers and moveit.
+4. On laptop, `cd` into workspace containing our packages.
+
+% can we have nader write about to how to load an image and create the csv file for it??
+
+5. In `mattagascar\mattagascar\iliketomoveitmoveit.py`, edit `file_name` to match  and load the saved path of the `.csv` file of desired image. 
+6. On laptop from the workspace containing our packages, run `ros2 launch listen_apriltags aprilTags.launch.xml` to start the realsense camera, rviz, and the april_tag node.
     - Before continuing, make sure there are no warnings within the tf tree in rviz and proceed
-4. Also in the workspace containing the packages, run `ros2 run CvBridge depth` to start the color detection of the paint locations.  
-5. Lastly, from the folder containing the desired image csv, run `ros2 run mattagascar iliketomoveitmoveit`
+7. Also in the workspace containing the packages, run `ros2 run CvBridge depth` to start the color detection of the paint locations.  
+8. Lastly, from the folder containing the desired image csv, run `ros2 run mattagascar iliketomoveitmoveit`
 
 ## Overall System Architecture and High Level 
 ### Packages:
